@@ -48,12 +48,18 @@ class Booking:
         
     @property
     def date(self):
-        
-        pass
+        return self._date
     
     @date.setter
     def date(self, date):
-        pass
+        if not isinstance(date, str):
+            raise TypeError("Date must be in string format")
+        elif not re.match(
+            r"([0][1-9]|[1][0-2])\/([0][1-9]|[12][0-9]|[3][01])\/\d{4}", date
+        ):
+            raise ValueError("Date must be in the format MM/DD/YYYY")
+        else:
+            self._date = date
     
     @property
     def destination(self):
