@@ -1,7 +1,7 @@
 import sqlite3
-# from models.booking import booking
-# from models.client import client
-# from models.destination import destination
+from booking import Booking
+# from client import Client
+# from destination import Destination
 
 
 CONN = sqlite3.connect('company.db')
