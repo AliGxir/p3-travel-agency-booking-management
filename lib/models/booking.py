@@ -93,12 +93,48 @@ class Booking:
             )
         self._total_price = total_price
             
-    #  Associate Methods
+    #  Association Methods
     def client(self):
         pass
-        # Client.find_by_id(self.client_id)
+        return Client.find_by_id(self.client_id) if self.client_id else None
     
     def destination(self):
         pass
-    
+        return Destination.find_by_id(self.destination_id) if self.destination_id else None
+        
+    # creating tables should follow the order of clients, destinations, then bookings
+    # dropping tables will go in the order opposite of creation
+    @classmethod
+    def create_table(cls):
+        try:
+            CURSOR.execute(
+                """
+                    CREATE TABLE IF NOT EXISTS bookings (
+                        id INTEGER PRIMARY KEY,
+                        start_date TEXT, 
+                        end_date TEXT, 
+                        total_price FLOAT, 
+                        client_id INTEGER, 
+                        destination_id INTEGER
+                    );
+                """
+            )
+            CONN.commit()
+        except Exception as e:
+            CONN.rollback()
+            return e 
+        
+    @classmethod   
+    def drop_table(cls):
+        try:
+            CURSOR.execute(
+                """
+                    DROP TABLE IF EXISTS bookings;
+                """
+                )
+            CONN.commit()
+        except Exception as e:
+            CONN.rollback()
+            return e 
+            
     
