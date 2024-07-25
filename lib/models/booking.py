@@ -1,6 +1,8 @@
 from models.__init__ import CURSOR, CONN
 import re
 from datetime import datetime
+
+
 class Booking:
     all = {}
 
@@ -12,7 +14,7 @@ class Booking:
         self.total_price = total_price
         self.client_id = client_id
         self.destination_id = destination_id
-        self.id = self 
+        self.id = self
 
     def __repr__(self):
         return (
@@ -31,7 +33,7 @@ class Booking:
     def client_id(self, client_id):
         if not isinstance(client_id, int):
             raise TypeError("Client_id must be an integer")
-        elif client_id < 1:# or not Client.find_by_id(client_id):
+        elif client_id < 1 or not Client.find_by_id(client_id):
             raise ValueError(
                 "Client_id must be a positive integer pointing to an existing client"
             )
@@ -45,7 +47,7 @@ class Booking:
     def destination_id(self, destination_id):
         if not isinstance(destination_id, int):
             raise TypeError("Destination_id must be an integer")
-        elif destination_id < 1:# or not Destination.find_by_id(destination_id):
+        elif destination_id < 1 or not Destination.find_by_id(destination_id):
             raise ValueError(
                 "Destination_id must be a positive integer pointing to an existing destination"
             )
@@ -64,7 +66,7 @@ class Booking:
         ):
             raise ValueError("start_Date must be in the format MM/DD/YYYY")
         self._start_date = start_date
-            
+
     @property
     def end_date(self):
         return self._end_date
@@ -92,18 +94,21 @@ class Booking:
                 "Total price must be in the format of float with 2 decimal places"
             )
         self._total_price = total_price
-            
+
     #  Association Methods
     def client(self):
         pass
         return Client.find_by_id(self.client_id) if self.client_id else None
-    
+
     def destination(self):
         pass
-        return Destination.find_by_id(self.destination_id) if self.destination_id else None
-        
+        return (
+            Destination.find_by_id(self.destination_id) if self.destination_id else None
+        )
+
     # creating tables should follow the order of clients, destinations, then bookings
     # dropping tables will go in the order opposite of creation
+    # Utility ORM Class Methods
     @classmethod
     def create_table(cls):
         try:
@@ -122,19 +127,19 @@ class Booking:
             CONN.commit()
         except Exception as e:
             CONN.rollback()
-            return e 
-        
-    @classmethod   
+            return e
+
+    @classmethod
     def drop_table(cls):
         try:
             CURSOR.execute(
                 """
                     DROP TABLE IF EXISTS bookings;
                 """
-                )
+            )
             CONN.commit()
         except Exception as e:
             CONN.rollback()
-            return e 
-            
-    
+            return e
+        
+        
