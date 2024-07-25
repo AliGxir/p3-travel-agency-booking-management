@@ -63,7 +63,7 @@ class Booking:
     
     @property
     def destination(self):
-        pass
+        if
     
     @destination.setter
     def destination(self, destination):
