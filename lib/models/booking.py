@@ -250,7 +250,7 @@ class Booking:
         type(self).all[self] = self
         return self
     
-    def dele(self):
+    def delete(self):
         CURSOR.execute(
             """ 
                 DELETE FROM clients

@@ -1,7 +1,6 @@
 from models.__init__ import CURSOR, CONN
 import re
 
-
 class Client:
     all = {}
 
@@ -63,7 +62,7 @@ class Client:
             (self.id,),
         )
         rows = CURSOR.fetchall()
-        return [Booking(row[1], row[2], row[3], row[4], row[0]) for row in rows]
+        return [Booking(row[1], row[2], row[3], row[0]) for row in rows]
 
     # Utility ORM Methods
 
@@ -74,10 +73,9 @@ class Client:
                 """
                     CREATE TABLE IF NOT EXISTS clients (
                         id INTEGER PRIMARY KEY,
-                        name TEXT,
                         location TEXT, 
-                        end_date TEXT, 
-                        category TEXT
+                        category TEXT,
+                        cost_per_day FLOAT
                     );
                 """
             )
@@ -90,7 +88,7 @@ class Client:
         try:
             CURSOR.execute(
                 """
-                DROP TABLE IF EXISTS clients;
+                DROP TABLE IF EXISTS destinations;
             """
             )
             CONN.commit()
@@ -98,71 +96,71 @@ class Client:
             return e
 
     @classmethod
-    def create(cls, name, location, end_date, category):
-        new_client = cls(name, location, end_date, category)
-        new_client.save()
-        return new_client
+    def create(cls,location, category, cost_per_day):
+        new_destination = cls(location, category, cost_per_day)
+        new_destination.save()
+        return new_destination
 
     @classmethod
     def new_from_db(cls):
         CURSOR.execute(
             """ 
-                SELECT  * FROM clients
+                SELECT  * FROM destination
                 ORDER BY id DESC
                 LIMIT 1;
             """
         )
         row= CURSOR.fetchone()
-        return cls(row[1], row[2], row[3], row[4], row[0])
+        return cls(row[1], row[2], row[3], row[0])
     
     @classmethod
     def get_all(cls):
         CURSOR.execute(
             """ 
-                SELECT * FROM clients;
+                SELECT * FROM destinations;
             """
         )
         rows= CURSOR.fetchall()
-        return [cls(row[1], row[2], row[3], row[4], row[0]) for row in rows]
+        return [cls(row[1], row[2], row[3], row[0]) for row in rows]
     
     @classmethod
-    def find_by_name(cls, name): 
+    def find_by_location(cls, location): 
         CURSOR.execute(
             """" 
-                SELECT * FROM clients
+                SELECT * FROM destinations
                 WHERE id is ?;
             """,
-                (name,),
+                (location,),
         )
         row = CURSOR.fetchone()
-        return cls(row[1], row[2], row[3], row[4], row[0]) if row else None
+        return cls(row[1], row[2], row[3], row[0]) if row else None
     
     @classmethod
     def find_by_id(cls, id):
         CURSOR.execute(
             """" 
-                SELECT * FROM clients
+                SELECT * FROM destination
                 WHERE id is ?;
             """,
                 (id,),
         )
         row = CURSOR.fetchone()
-        return cls(row[1],  row[2], row[3], row[4], row[0]) if row else None
+        return cls(row[1],  row[2], row[3], row[0]) if row else None
     
     @classmethod
-    def find_or_create_by(cls, name, location, end_date, category):
-        return cls.find_by_name(name) or cls.create(
-            name, location, end_date, category
+    def find_or_create_by(cls, location, category, cost_per_day):
+        return cls.find_by_location(location) or cls.create(
+            location, category, cost_per_day
         )
         
     # Utility ORM Instance Methods
     def save(self):
         CURSOR.execute(
             """ 
-                INSERT INTO clients (name, location, end_date, category)
-                VALUES (?, ?, ?, ?);
+                INSERT INTO clients (location, category, cost_per_day)
+                VALUES (?, ?, ?);
             """,
-                (self.name, self.location, self.end_date, self.category),
+                (self.location, self.category, self.cost_per_day),
         )
         CONN.commit()
         self.id = CURSOR.lastrowid
@@ -172,17 +170,17 @@ class Client:
     def update(self):
         CURSOR.execute(
             """" 
-                UPDATE clients
-                SET name = ?, location = ?, end_date = ?, category = ?
+                UPDATE destinations
+                SET location = ?, category = ?, cost_per_day = ?
                 WHERE id = ?
             """, 
-                (self.name, self.location, self.end_date, self.category, self.id),
+                (self.location, self.category, self.cost_per_day, self.id),
         )
         CONN.commit()
         type(self).all[self] = self
         return self
     
-    def dele(self):
+    def delete(self):
         CURSOR.execute(
             """ 
                 DELETE FROM clients
