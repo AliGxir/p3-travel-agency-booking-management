@@ -60,4 +60,9 @@ class Client:
     
     @category.setter
     def category(self, category):
+        if not isinstance(self, catergory):
+            raise TypeError("category must be in string format")
+        elif not ("nature", "history", "food", "excursion")
+            raise ValueError("category must be one of the options of: nature, history, food, or excursion")
+        self._category = category 
         
