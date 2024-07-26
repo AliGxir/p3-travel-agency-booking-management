@@ -172,4 +172,44 @@ class Client:
             name, start_date, end_date, category
         )
         
+    # Utility ORM Instance Methods
+    def save(self):
+        CURSOR.execute(
+            """ 
+                INSERT INTO clients (name, start_date, end_date, category)
+                VALUES (?, ?, ?, ?);
+            """,
+                (self.name, self.start_date, self.end_date, self.category),
+        )
+        CONN.commit()
+        self.id = CURSOR.lastrowid
+        type(self).all[self.id] = self
+        return self
     
+    def update(self):
+        CURSOR.execute(
+            """" 
+                UPDATE clients
+                SET name = ?, start_date = ?, end_date = ?, category = ?
+                WHERE id = ?
+            """, 
+                (self.name, self.start_date, self.end_date, self.category, self.id),
+        )
+        CONN.commit()
+        type(self).all[self] = self
+        return self
+    
+    def dele(self):
+        CURSOR.execute(
+            """ 
+                DELETE FROM clients
+                WHERE id = ?
+            """,
+                (self.id,),
+        )
+        CONN.commit()
+        del type(self).all[self.id]
+        self.id = None
+        return self
+    
+from models.booking import Booking 
