@@ -106,8 +106,17 @@ class Booking:
             Destination.find_by_id(self.destination_id) if self.destination_id else None
         )
 
+
+    # Helper Methods
+    def in_the_future_start_date(self, start_date):
+        pass
+    
+    def in_the_future_end_date(self, end_date):
+        pass
+        
     # creating tables should follow the order of clients, destinations, then bookings
     # dropping tables will go in the order opposite of creation
+    
     # Utility ORM Class Methods
     @classmethod
     def create_table(cls):
@@ -142,4 +151,117 @@ class Booking:
             CONN.rollback()
             return e
         
+    @classmethod
+    def create(cls, start_date, end_date, total_price, client_id, destination_id):
+        new_booking = cls(start_date, end_date, total_price, client_id, destination_id)
+        new_booking.save()
+        return new_booking
+    
+    @classmethod
+    def new_from_db(cls):
+        CURSOR.execute(
+            """ 
+                SELECT  * FROM bookings
+                ORDER BY id DESC
+                LIMIT 1;
+            """
+        )
+        row= CURSOR.fetchone()
+        booking = cls(row[1], row[2], row[3], row[4], row[5], row[0])
+        cls.all[booking.id] = booking
+        return booking
+    
+    @classmethod
+    def get_all(cls):
+        CURSOR.execute(
+            """ 
+                SELECT * FROM bookings;
+            """
+        )
+        rows= CURSOR.fetchall()
+        return [cls(row[1], row[2], row[3], row[4], row[5], row[0]) for row in rows]
+    
+    @classmethod
+    def find_by_start_or_end_date(cls, start_date, end_date): 
+        CURSOR.execute(
+            """" 
+                SELECT * FROM bookings
+                WHERE start_date is ? AND end_date is ?;
+            """,
+                (start_date, end_date),
+        )
+        row = CURSOR.fetchone()
+        return cls(row[1], row[2], row[3], row[4], row[5], row[0]) if row else None
+    
+    @classmethod
+    def find_by_total_price(cls, total_price):
+        CURSOR.execute(
+            """" 
+                SELECT * FROM bookings
+                WHERE total_price is ?;
+            """,
+                (total_price,),
+        )
+        row = CURSOR.fetchone()
+        return cls(row[1],  row[2], row[3], row[4], row[5], row[0]) if row else None
+    
+    @classmethod
+    def find_by_id(cls, id):
+        CURSOR.execute(
+            """" 
+                SELECT * FROM bookings
+                WHERE id is ?;
+            """,
+                (id,),
+        )
+        row = CURSOR.fetchone()
+        return cls(row[1],  row[2], row[3], row[4], row[5], row[0]) if row else None
+    
+    @classmethod
+    def find_or_create_by(cls, start_date, end_date, total_price, client_id, destination_id):
+        return cls.find_by_start_or_end_date(start_date, end_date) or cls.create(
+            start_date, end_date, total_price, client_id, destination_id
+        )
         
+    # Utility ORM Instance Methods
+    def save(self):
+        CURSOR.execute(
+            """ 
+                INSERT INTO clients (name, start_date, end_date, category)
+                VALUES (?, ?, ?, ?);
+            """,
+                (self.name, self.start_date, self.end_date, self.category),
+        )
+        CONN.commit()
+        self.id = CURSOR.lastrowid
+        type(self).all[self.id] = self
+        return self
+    
+    def update(self):
+        CURSOR.execute(
+            """" 
+                UPDATE clients
+                SET name = ?, start_date = ?, end_date = ?, category = ?
+                WHERE id = ?
+            """, 
+                (self.name, self.start_date, self.end_date, self.category, self.id),
+        )
+        CONN.commit()
+        type(self).all[self] = self
+        return self
+    
+    def dele(self):
+        CURSOR.execute(
+            """ 
+                DELETE FROM clients
+                WHERE id = ?
+            """,
+                (self.id,),
+        )
+        CONN.commit()
+        del type(self).all[self.id]
+        self.id = None
+        return self
+    
+from models.client import Client
+from models.destination import Destination
