@@ -1,6 +1,6 @@
 from models.booking import Booking
-# from models.destinations import Destination
-# from models.clients import Client
+from models.destination import Destination
+from models.client import Client
 from random import sample
 from faker import Faker
 fake = Faker()
@@ -21,45 +21,45 @@ DESTINATIONS = [
 
 def drop_tables():
     Booking.drop_table()
-    # Client.drop_table()
-    # Destination.drop_table()
+    Client.drop_table()
+    Destination.drop_table()
 
 
 def create_tables():
     Booking.create_table()
-    # Client.create_table()
-    # Destination.create_table()
+    Client.create_table()
+    Destination.create_table()
 
 
-# def seed_tables():
-    # for _ in range(50):
-    #     try:
-    #         Destination.create(fake.name(), fake.category(), fake.cost_per_day())
-    #         Client.create(
-    #             fake.name(),
-    #             fake.availability(),
-    #             fake.start_date(),
-    #             fake.end_date(),
-    #             fake.category(),
-    #             sample(DESTINATIONS, 1)[0],
-    #         )
-    #         print("Created destination and client")
-    #     except Exception as e:
-    #         print("Failed to create destination and client due to error: ", e)
+def seed_tables():
+    for _ in range(50):
+        try:
+            Destination.create(fake.name(), fake.category(), fake.cost_per_day())
+            Client.create(
+                fake.name(),
+                fake.availability(),
+                fake.start_date(),
+                fake.end_date(),
+                fake.category(),
+                sample(DESTINATIONS, 1)[0],
+            )
+            print("Created destination and client")
+        except Exception as e:
+            print("Failed to create destination and client due to error: ", e)
 
-    # for _ in range(10):
-        # try:
-        #     destinations = Destination.get_all()
-        #     clients = Client.get_all()
-        #     Booking.create(
-        #         fake.date(),
-        #         fake.total_price(),
-        #         sample(clients, 1)[0].id,
-        #         sample(destinations, 1)[0].id,
-        #     )
-        #     print("Created booking")
-        # except Exception as e:
-        #     print("Failed to create booking due to error: ", e)
+    for _ in range(10):
+        try:
+            destinations = Destination.get_all()
+            clients = Client.get_all()
+            Booking.create(
+                fake.date(),
+                fake.total_price(),
+                sample(clients, 1)[0].id,
+                sample(destinations, 1)[0].id,
+            )
+            print("Created booking")
+        except Exception as e:
+            print("Failed to create booking due to error: ", e)
 
 
 if __name__ == "__main__":
@@ -67,8 +67,8 @@ if __name__ == "__main__":
     print("Tables dropped!")
     create_tables()
     print("Tables created!")
-    # seed_tables()
-    # print("Seed data complete!")
+    seed_tables()
+    print("Seed data complete!")
     import ipdb
 
     ipdb.set_trace()
