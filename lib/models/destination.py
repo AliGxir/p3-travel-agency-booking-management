@@ -1,7 +1,7 @@
 from models.__init__ import CURSOR, CONN
 import re
 
-class Client:
+class Destination:
     all = {}
 
     def __init__(self, location, category, cost_per_day):
