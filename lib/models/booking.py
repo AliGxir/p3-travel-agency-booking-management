@@ -193,17 +193,17 @@ class Booking:
         row = CURSOR.fetchone()
         return cls(row[1], row[2], row[3], row[4], row[5], row[0]) if row else None
     
-    @classmethod
-    def find_by_total_price(cls, total_price):
-        CURSOR.execute(
-            """" 
-                SELECT * FROM bookings
-                WHERE total_price is ?;
-            """,
-                (total_price,),
-        )
-        row = CURSOR.fetchone()
-        return cls(row[1],  row[2], row[3], row[4], row[5], row[0]) if row else None
+    # @classmethod
+    # def find_by_total_price(cls, total_price):
+    #     CURSOR.execute(
+    #         """" 
+    #             SELECT * FROM bookings
+    #             WHERE total_price is ?;
+    #         """,
+    #             (total_price,),
+    #     )
+    #     row = CURSOR.fetchone()
+    #     return cls(row[1],  row[2], row[3], row[4], row[5], row[0]) if row else None
     
     @classmethod
     def find_by_id(cls, id):

@@ -21,7 +21,7 @@ class Destination:
     def name(self, location):
         if isinstance(location, str):
             raise TypeError("name must be in string format")
-        elif not re.match(r"^[a-zA-Z]", location):
+        elif not re.match(r"^[a-zA-Z]+(?:\s[a-zA-Z]+)?$", location):
             raise ValueError("Please fill out location")
         self._location = location
 
