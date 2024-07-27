@@ -22,7 +22,7 @@ def menu():
     print("13. Delete a client")
     print("14. Delete a destination")
     print("15. Delete an booking")
-    print("16. Find clients by destination location")
+    print("16. Find destinations by client's name")
     print("17. Exit")
     
 def list_clients():
@@ -241,11 +241,64 @@ def updating_booking():
             print("Error updating booking: ", e)
     print("Invalid id, start_date, end_date, total_price, client_name, destination_location")
     
+def delete_client_by_id(id):
+    if client:= Client.find_by_id(int(id)):
+        client.delete()
+        print("Client successfully deleted")
+    else:
+        print("Invalid id")
+        
 def delete_client():
+    idx = input("Enter the client's id: ")
+    if isinstance(idx, str) and re.match(r"^\d+$", idx) and int(idx) > 0:
+        try: 
+            delete_client_by_id(idx)
+        except Exception as e:
+            print("Error deleting client: ", e)
+    print("Invalid id")
     
-
+def delete_destination_by_id(id):
+    destination = Destination.find_by_id(id)
+    destination = destination.delete()
+    print(destination)
     
+def delete_destination():
+    idx = input("Enter the destination's id: ")
+    if isinstance(idx, str) and re.match(r"^\d+$", idx) and int(idx) > 0:
+        try:
+            delete_destination_by_id(idx)
+        except Exception as e:
+            print("Error deleting destination: ", e)
+    else:
+        print("Invalid id")
+        
+def delete_booking_by_id(id):
+    booking = Booking.find_by_id(id)
+    booking = booking.delete()
+    print(booking)
 
+
+def delete_booking():
+    idx = input("Enter the booking's id: ")
+    if isinstance(idx, str) and re.match(r"^\d+$", idx) and int(idx) > 0:
+        try:
+            delete_booking_by_id(idx)
+        except Exception as e:
+            print("Error deleting booking: ", e)
+    else:
+        print("Invalid id")
+        
+def find_destinations_by_client_name():
+    name = input("Enter the client's name ")
+    if name and re.match(r"^[a-zA-Z ]+$", name) and name.title():
+        if client := Client.find_by_name(name.title()):
+            destinations = client.destinations()
+            for destination in destinations:
+                print(destination())
+    else:
+        print("Invalid name")
+    
+    
 from models.client import Client
 from models.destination import Destination 
 from models.booking import Booking
