@@ -1,23 +1,29 @@
 from models.booking import Booking
 from models.destination import Destination
 from models.client import Client
-from random import sample
+from random import sample, choice
 from faker import Faker
 fake = Faker()
 
 DESTINATIONS = [
-    "Oahu"
-    "Rome"
-    "Paris"
-    "Tokyo"
-    "Amsterdam"
-    "Singapore"
-    "Bangkok"
-    "Hong Kong"
-    "New York"
+    "Oahu",
+    "Rome",
+    "Paris",
+    "Tokyo",
+    "Amsterdam",
+    "Singapore",
+    "Bangkok",
+    "Hong Kong",
+    "New York",
     "San Francisco"
 ]
 
+category = [
+    "nature",
+    "food",
+    "historic",
+    "excursion"
+]
 
 def drop_tables():
     Booking.drop_table()
@@ -34,14 +40,17 @@ def create_tables():
 def seed_tables():
     for _ in range(50):
         try:
-            Destination.create(fake.name(), fake.category(), fake.cost_per_day())
+            Destination.create(
+                location = choice(DESTINATIONS), 
+                category = choice(category), 
+                cost_per_day = fake.random_number(digits=3)
+            )
             Client.create(
-                fake.name(),
-                fake.availability(),
-                fake.start_date(),
-                fake.end_date(),
-                fake.category(),
-                sample(DESTINATIONS, 1)[0],
+                name = fake.name(),
+                start_date = fake.date_this_year(),
+                end_date = fake.date_this_year(),
+                category = choice(category),
+                destination = choice(DESTINATIONS),
             )
             print("Created destination and client")
         except Exception as e:
@@ -52,10 +61,11 @@ def seed_tables():
             destinations = Destination.get_all()
             clients = Client.get_all()
             Booking.create(
-                fake.date(),
-                fake.total_price(),
-                sample(clients, 1)[0].id,
-                sample(destinations, 1)[0].id,
+                start_date = fake.date_this_year(),
+                end_date = fake.date_this_year(),
+                total_price = fake.random_number(digits=3),
+                client_id = sample(clients, 1)[0].id,
+                destination_id = sample(destinations, 1)[0].id
             )
             print("Created booking")
         except Exception as e:

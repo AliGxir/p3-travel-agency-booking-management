@@ -103,7 +103,7 @@ class Client:
             return e
 
     @classmethod
-    def drop_table():
+    def drop_table(cls):
         try:
             CURSOR.execute(
                 """

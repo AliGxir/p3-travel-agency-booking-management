@@ -71,7 +71,7 @@ class Destination:
         try:
             CURSOR.execute(
                 """
-                    CREATE TABLE IF NOT EXISTS clients (
+                    CREATE TABLE IF NOT EXISTS destinations (
                         id INTEGER PRIMARY KEY,
                         location TEXT, 
                         category TEXT,
@@ -84,7 +84,7 @@ class Destination:
             return e
 
     @classmethod
-    def drop_table():
+    def drop_table(cls):
         try:
             CURSOR.execute(
                 """
