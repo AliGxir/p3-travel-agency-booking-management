@@ -5,15 +5,16 @@ import re
 class Client:
     all = {}
 
-    def __init__(self, name, start_date, end_date, category):
+    def __init__(self, name, start_date, end_date, category, destination):
         self.name = name
         self.start_date = start_date
         self.end_date = end_date
         self.category = category
+        self.destination = destination
         self.id = self
 
     def __repr__(self):
-        return f"<Client {self.id}: {self.name}, {self.start_date}, {self.end_date}, {self.category}"
+        return f"<Client {self.id}: {self.name}, {self.start_date}, {self.end_date}, {self.category}, {self.destination}"
 
     @property
     def name(self):
@@ -63,11 +64,36 @@ class Client:
     def category(self, category):
         if not isinstance(self, category):
             raise TypeError("category must be in string format")
-        elif not ("nature", "history", "food", "excursion"):
+        elif not ("nature", "historic", "food", "excursion"):
             raise ValueError(
-                "category must be one of the options of: nature, history, food, or excursion"
+                "category must be one of the options of: nature, historic, food, or excursion"
             )
         self._category = category
+
+    @property
+    def destination(self):
+        return self._destination
+
+    @destination.setter
+    def destination(self, destination):
+        if not isinstance(self, destination):
+            raise TypeError("destination must be in string format")
+        elif not (
+            "Oahu",
+            "Rome",
+            "Paris",
+            "Tokyo",
+            "Amsterdam",
+            "Singapore",
+            "Bangkok",
+            "Hong Kong",
+            "New York",
+            "San Francisco",
+        ):
+            raise ValueError(
+                "destination must be one of the options of: Oahu, Rome, Paris,Tokyo,Amsterdam, Singapore, Bangkok, Hong Kong, New York, San Francisco"
+            )
+        self._destination = destination
 
     # Association Methods
 
@@ -129,9 +155,9 @@ class Client:
                 LIMIT 1;
             """
         )
-        row= CURSOR.fetchone()
+        row = CURSOR.fetchone()
         return cls(row[1], row[2], row[3], row[4], row[0])
-    
+
     @classmethod
     def get_all(cls):
         CURSOR.execute(
@@ -139,21 +165,21 @@ class Client:
                 SELECT * FROM clients;
             """
         )
-        rows= CURSOR.fetchall()
+        rows = CURSOR.fetchall()
         return [cls(row[1], row[2], row[3], row[4], row[0]) for row in rows]
-    
+
     @classmethod
-    def find_by_name(cls, name): 
+    def find_by_name(cls, name):
         CURSOR.execute(
             """" 
                 SELECT * FROM clients
                 WHERE id is ?;
             """,
-                (name,),
+            (name,),
         )
         row = CURSOR.fetchone()
         return cls(row[1], row[2], row[3], row[4], row[0]) if row else None
-    
+
     @classmethod
     def find_by_id(cls, id):
         CURSOR.execute(
@@ -161,17 +187,17 @@ class Client:
                 SELECT * FROM clients
                 WHERE id is ?;
             """,
-                (id,),
+            (id,),
         )
         row = CURSOR.fetchone()
-        return cls(row[1],  row[2], row[3], row[4], row[0]) if row else None
-    
+        return cls(row[1], row[2], row[3], row[4], row[0]) if row else None
+
     @classmethod
     def find_or_create_by(cls, name, start_date, end_date, category):
         return cls.find_by_name(name) or cls.create(
             name, start_date, end_date, category
         )
-        
+
     # Utility ORM Instance Methods
     def save(self):
         CURSOR.execute(
@@ -179,37 +205,38 @@ class Client:
                 INSERT INTO clients (name, start_date, end_date, category)
                 VALUES (?, ?, ?, ?);
             """,
-                (self.name, self.start_date, self.end_date, self.category),
+            (self.name, self.start_date, self.end_date, self.category),
         )
         CONN.commit()
         self.id = CURSOR.lastrowid
         type(self).all[self.id] = self
         return self
-    
+
     def update(self):
         CURSOR.execute(
             """" 
                 UPDATE clients
                 SET name = ?, start_date = ?, end_date = ?, category = ?
                 WHERE id = ?
-            """, 
-                (self.name, self.start_date, self.end_date, self.category, self.id),
+            """,
+            (self.name, self.start_date, self.end_date, self.category, self.id),
         )
         CONN.commit()
         type(self).all[self] = self
         return self
-    
+
     def delete(self):
         CURSOR.execute(
             """ 
                 DELETE FROM clients
                 WHERE id = ?
             """,
-                (self.id,),
+            (self.id,),
         )
         CONN.commit()
         del type(self).all[self.id]
         self.id = None
         return self
-    
-from models.booking import Booking 
+
+
+from models.booking import Booking

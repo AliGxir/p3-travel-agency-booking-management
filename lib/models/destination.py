@@ -18,7 +18,7 @@ class Destination:
         return self._location 
 
     @location.setter
-    def name(self, location):
+    def location(self, location):
         if isinstance(location, str):
             raise TypeError("name must be in string format")
         elif not re.match(r"^[a-zA-Z]+(?:\s[a-zA-Z]+)?$", location):

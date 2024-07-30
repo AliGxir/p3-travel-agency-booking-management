@@ -20,8 +20,8 @@ DESTINATIONS = [
 
 category = [
     "nature",
-    "food",
     "historic",
+    "food",
     "excursion"
 ]
 
