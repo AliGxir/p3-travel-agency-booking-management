@@ -79,6 +79,5 @@ if __name__ == "__main__":
     print("Tables created!")
     seed_tables()
     print("Seed data complete!")
-    import ipdb
-
-    ipdb.set_trace()
+    # import ipdb
+    # ipdb.set_trace()

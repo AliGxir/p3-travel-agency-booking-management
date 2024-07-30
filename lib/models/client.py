@@ -1,7 +1,6 @@
 from models.__init__ import CURSOR, CONN
 import re
 
-
 class Client:
     all = {}
 
@@ -22,7 +21,7 @@ class Client:
 
     @name.setter
     def name(self, name):
-        if isinstance(name, str):
+        if not isinstance(name, str):
             raise TypeError("name must be in string format")
         elif not re.match(r"^[a-zA-Z]", name):
             raise ValueError("Please fill out name")
@@ -62,7 +61,7 @@ class Client:
 
     @category.setter
     def category(self, category):
-        if not isinstance(self, category):
+        if not isinstance(category, str):
             raise TypeError("category must be in string format")
         elif not ("nature", "historic", "food", "excursion"):
             raise ValueError(
@@ -76,7 +75,7 @@ class Client:
 
     @destination.setter
     def destination(self, destination):
-        if not isinstance(self, destination):
+        if not isinstance(destination, str):
             raise TypeError("destination must be in string format")
         elif not (
             "Oahu",
@@ -98,16 +97,18 @@ class Client:
     # Association Methods
 
     def bookings(self):
-        CURSOR.execute(
-            """
-            SELECT * FROM bookings
-            WHERE client_id = ?
-        """,
-            (self.id,),
-        )
-        rows = CURSOR.fetchall()
-        return [Booking(row[1], row[2], row[3], row[4], row[5], row[0]) for row in rows]
-
+        try: 
+            CURSOR.execute(
+                """
+                SELECT * FROM bookings
+                WHERE client_id = ?
+            """,
+                (self.id,),
+            )
+            rows = CURSOR.fetchall()
+            return [Booking(row[1], row[2], row[3], row[4], row[5], row[0]) for row in rows]
+        except Exception as e:
+            return e
     # Utility ORM Methods
 
     @classmethod
@@ -143,78 +144,97 @@ class Client:
 
     @classmethod
     def create(cls, name, start_date, end_date, category, destination):
-        new_client = cls(name, start_date, end_date, category, destination)
-        new_client.save()
-        return new_client
+        try:
+            new_client = cls(name, start_date, end_date, category, destination)
+            new_client.save()
+            return new_client
+        except Exception as e:
+            return e
 
     @classmethod
     def new_from_db(cls):
-        CURSOR.execute(
-            """ 
-                SELECT  * FROM clients
-                ORDER BY id DESC
-                LIMIT 1;
-            """
-        )
-        row = CURSOR.fetchone()
-        return cls(row[1], row[2], row[3], row[4], row[5], row[0])
+        try:
+            CURSOR.execute(
+                """ 
+                    SELECT  * FROM clients
+                    ORDER BY id DESC
+                    LIMIT 1;
+                """
+            )
+            row = CURSOR.fetchone()
+            return cls(row[1], row[2], row[3], row[4], row[5], row[0])
+        except Exception as e:
+            return e
 
     @classmethod
     def get_all(cls):
-        CURSOR.execute(
-            """ 
-                SELECT * FROM clients;
-            """
-        )
-        rows = CURSOR.fetchall()
-        return [cls(row[1], row[2], row[3], row[4], row[5], row[0]) for row in rows]
+        try:
+            CURSOR.execute(
+                """ 
+                    SELECT * FROM clients;
+                """
+            )
+            rows = CURSOR.fetchall()
+            return [cls(row[1], row[2], row[3], row[4], row[5], row[0]) for row in rows]
+        except Exception as e:
+            return e
 
     @classmethod
     def find_by_name(cls, name):
-        CURSOR.execute(
-            """" 
-                SELECT * FROM clients
-                WHERE id is ?;
-            """,
-            (name,),
-        )
-        row = CURSOR.fetchone()
-        return cls(row[1], row[2], row[3], row[4], row[5], row[0]) if row else None
+        try: 
+            CURSOR.execute(
+                """" 
+                    SELECT * FROM clients
+                    WHERE id is ?;
+                """,
+                (name,),
+            )
+            row = CURSOR.fetchone()
+            return cls(row[1], row[2], row[3], row[4], row[5], row[0]) if row else None
+        except Exception as e:
+            return e
 
     @classmethod
     def find_by_id(cls, id):
-        CURSOR.execute(
-            """" 
-                SELECT * FROM clients
-                WHERE id is ?;
-            """,
-            (id,),
-        )
-        row = CURSOR.fetchone()
-        return cls(row[1], row[2], row[3], row[4], row[5], row[0]) if row else None
-
-    @classmethod
-    def find_or_create_by(cls, name, start_date, end_date, category, destination):
-        return cls.find_by_name(name) or cls.create(
-            name, start_date, end_date, category, destination
-        )
+        try:
+            CURSOR.execute(
+                """" 
+                    SELECT * FROM clients
+                    WHERE id is ?;
+                """,
+                (id,),
+            )
+            row = CURSOR.fetchone()
+            return cls(row[1], row[2], row[3], row[4], row[5], row[0]) if row else None
+        except Exception as e:
+            return e
+    
+    # @classmethod
+    # def find_or_create_by(cls, name, start_date, end_date, category, destination):
+    #     return cls.find_by_name(name) or cls.create(
+    #         name, start_date, end_date, category, destination
+    #     )
 
     # Utility ORM Instance Methods
     def save(self):
-        CURSOR.execute(
-            """ 
-                INSERT INTO clients (name, start_date, end_date, category, destination)
-                VALUES (?, ?, ?, ?);
-            """,
-            (self.name, self.start_date, self.end_date, self.category, self.destination),
-        )
-        CONN.commit()
-        self.id = CURSOR.lastrowid
-        type(self).all[self.id] = self
-        return self
+        try:
+            CURSOR.execute(
+                """ 
+                    INSERT INTO clients (name, start_date, end_date, category, destination)
+                    VALUES (?, ?, ?, ?, ?);
+                """,
+                (self.name, self.start_date, self.end_date, self.category, self.destination),
+            )
+            CONN.commit()
+            self.id = CURSOR.lastrowid
+            type(self).all[self.id] = self
+            return self
+        except Exception as e:
+            return e
 
     def update(self):
-        CURSOR.execute(
+        try:
+            CURSOR.execute(
             """" 
                 UPDATE clients
                 SET name = ?, start_date = ?, end_date = ?, category = ?, destination = ?
@@ -222,22 +242,26 @@ class Client:
             """,
             (self.name, self.start_date, self.end_date, self.category,self.destination, self.id),
         )
-        CONN.commit()
-        type(self).all[self] = self
-        return self
+            CONN.commit()
+            type(self).all[self] = self
+            return self
+        except Exception as e:
+            return e
 
     def delete(self):
-        CURSOR.execute(
-            """ 
-                DELETE FROM clients
-                WHERE id = ?
-            """,
-            (self.id,),
-        )
-        CONN.commit()
-        del type(self).all[self.id]
-        self.id = None
-        return self
-
+        try:
+            CURSOR.execute(
+                """ 
+                    DELETE FROM clients
+                    WHERE id = ?
+                """,
+                (self.id,),
+            )
+            CONN.commit()
+            del type(self).all[self.id]
+            self.id = None
+            return self
+        except Exception as e:
+            return e
 
 from models.booking import Booking
