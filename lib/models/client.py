@@ -106,7 +106,7 @@ class Client:
             (self.id,),
         )
         rows = CURSOR.fetchall()
-        return [Booking(row[1], row[2], row[3], row[4], row[0]) for row in rows]
+        return [Booking(row[1], row[2], row[3], row[4], row[5], row[0]) for row in rows]
 
     # Utility ORM Methods
 
@@ -120,7 +120,8 @@ class Client:
                         name TEXT,
                         start_date TEXT, 
                         end_date TEXT, 
-                        category TEXT
+                        category TEXT,
+                        destination TEXT
                     );
                 """
             )
@@ -141,8 +142,8 @@ class Client:
             return e
 
     @classmethod
-    def create(cls, name, start_date, end_date, category):
-        new_client = cls(name, start_date, end_date, category)
+    def create(cls, name, start_date, end_date, category, destination):
+        new_client = cls(name, start_date, end_date, category, destination)
         new_client.save()
         return new_client
 
@@ -156,7 +157,7 @@ class Client:
             """
         )
         row = CURSOR.fetchone()
-        return cls(row[1], row[2], row[3], row[4], row[0])
+        return cls(row[1], row[2], row[3], row[4], row[5], row[0])
 
     @classmethod
     def get_all(cls):
@@ -166,7 +167,7 @@ class Client:
             """
         )
         rows = CURSOR.fetchall()
-        return [cls(row[1], row[2], row[3], row[4], row[0]) for row in rows]
+        return [cls(row[1], row[2], row[3], row[4], row[5], row[0]) for row in rows]
 
     @classmethod
     def find_by_name(cls, name):
@@ -178,7 +179,7 @@ class Client:
             (name,),
         )
         row = CURSOR.fetchone()
-        return cls(row[1], row[2], row[3], row[4], row[0]) if row else None
+        return cls(row[1], row[2], row[3], row[4], row[5], row[0]) if row else None
 
     @classmethod
     def find_by_id(cls, id):
@@ -190,22 +191,22 @@ class Client:
             (id,),
         )
         row = CURSOR.fetchone()
-        return cls(row[1], row[2], row[3], row[4], row[0]) if row else None
+        return cls(row[1], row[2], row[3], row[4], row[5], row[0]) if row else None
 
     @classmethod
-    def find_or_create_by(cls, name, start_date, end_date, category):
+    def find_or_create_by(cls, name, start_date, end_date, category, destination):
         return cls.find_by_name(name) or cls.create(
-            name, start_date, end_date, category
+            name, start_date, end_date, category, destination
         )
 
     # Utility ORM Instance Methods
     def save(self):
         CURSOR.execute(
             """ 
-                INSERT INTO clients (name, start_date, end_date, category)
+                INSERT INTO clients (name, start_date, end_date, category, destination)
                 VALUES (?, ?, ?, ?);
             """,
-            (self.name, self.start_date, self.end_date, self.category),
+            (self.name, self.start_date, self.end_date, self.category, self.destination),
         )
         CONN.commit()
         self.id = CURSOR.lastrowid
@@ -216,10 +217,10 @@ class Client:
         CURSOR.execute(
             """" 
                 UPDATE clients
-                SET name = ?, start_date = ?, end_date = ?, category = ?
+                SET name = ?, start_date = ?, end_date = ?, category = ?, destination = ?
                 WHERE id = ?
             """,
-            (self.name, self.start_date, self.end_date, self.category, self.id),
+            (self.name, self.start_date, self.end_date, self.category,self.destination, self.id),
         )
         CONN.commit()
         type(self).all[self] = self

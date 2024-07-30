@@ -216,7 +216,7 @@ def update_booking_by_id(id, start_date, end_date, total_price, client_id, desti
     except Exception as e:
         print("Error updating booking: ", e)
         
-def updating_booking():
+def update_booking():
     idx = input("Enter the booking's id: ")
     start_date = input("Enter the destination's start date (MM/DD/YYYY): ")
     end_date = input("Enter the destination's end date (MM/DD/YYYY): ")
