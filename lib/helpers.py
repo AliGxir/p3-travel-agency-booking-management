@@ -38,7 +38,7 @@ def list_clients():
 def list_destinations():
     if destinations := Destination.get_all():
         for destination in destinations:
-            print(destinations)
+            print(destination)
     else:
         print(
             "We are in the process of switching over to a different tourism company and cannot display list of destinations"
@@ -54,7 +54,7 @@ def list_bookings():
 
 
 def find_client_by_name():
-    name = input("Enter client's name: ")
+    name = input("Enter client's full name: ")
     if len(name.strip()) and re.match(r"^[a-zA-Z]", name) and name.title():
         client = Client.find_by_name(name.title())
         print(client) if client else print("No client found")
@@ -63,26 +63,31 @@ def find_client_by_name():
 
 
 def find_destination_by_location():
-    location = input("Enter the destination: ")
-    if (
-        len(location.strip())
-        and re.match(r"^[a-zA-Z]+(?:\s[a-zA-Z]+)?$", location)
-        and location.title()
-    ):
-        destination = Destination.find_by_location(location.title())
-        print(destination) if destination else print("No destination found")
+    print("Available Destinations:")
+    for index, destination in enumerate(DESTINATIONS, start=1):
+        print(f"{index}. {destination}")
+    choice = input("Enter the number corresponding to your destination: ")
+    if choice.isdigit() and 1 <= int(choice) <= len(DESTINATIONS):
+        selected_destination = DESTINATIONS[int(choice) - 1]
+        print(f"Destination selected: {selected_destination}")
     else:
-        print("Invalid destination")
+        print("Invalid selection. Please enter a valid number.")
 
 
-def find_booking_by_start_date_or_end_date():
-    start_date = input("Enter the start date of the trip (MM/DD/YYYY): ")
-    end_date = input("Enter the end date of the trip (MM/DD/YYYY): ")
-    if isinstance(start_date, end_date, str) and len(start_date) and len(end_date):
-        booking = Booking.find_by_start_or_end_date(start_date, end_date)
-        print(booking) if booking else print("No bookings found")
-    else:
-        print("Invalid start/end date")
+def find_booking_by_client_id():
+    client_id = input("Enter client's id: ").strip()
+    try:
+        client_id = int(client_id)
+        if client_id > 0:
+            booking = Booking.find_by_client_id(client_id)
+            if booking:
+                print(booking)
+            else:
+                print("No bookings found")
+        else:
+            print("Invalid client_id: ID should be a positive integer")
+    except ValueError:
+        print("Invalid client_id: Please enter a valid number")
 
 
 def find_destinations_by_client_name():
@@ -359,3 +364,4 @@ def exit_program():
 from models.client import Client
 from models.destination import Destination
 from models.booking import Booking
+from seed import DESTINATIONS

@@ -6,7 +6,7 @@ from helpers import (
     list_bookings,
     find_client_by_name,
     find_destination_by_location,
-    find_booking_by_start_date_or_end_date,
+    find_booking_by_id,
     create_client,
     create_destination,
     create_booking,
@@ -38,7 +38,7 @@ class CLI:
             elif choice == "5":
                 find_destination_by_location()
             elif choice == "6":
-                find_booking_by_start_date_or_end_date()
+                find_booking_by_id()
             elif choice == "7":
                 create_client()
             elif choice == "8":

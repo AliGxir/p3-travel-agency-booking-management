@@ -13,6 +13,7 @@ class Booking:
         self.total_price = total_price
         self.client_id = client_id
         self.destination_id = destination_id
+        self.id = id
 
     def __repr__(self):
         return (

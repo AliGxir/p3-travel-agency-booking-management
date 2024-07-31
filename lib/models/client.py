@@ -195,7 +195,7 @@ class Client:
             CURSOR.execute(
                 """ 
                     SELECT * FROM clients
-                    WHERE id is ?;
+                    WHERE name is ?;
                 """,
                 (name,),
             )

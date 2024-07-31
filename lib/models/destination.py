@@ -11,7 +11,7 @@ class Destination:
         self.id = id
 
     def __repr__(self):
-        return f"<Destination{self.id}: {self.location}, {self.category}, {self.cost_per_day}"
+        return f"<Destination {self.id}: {self.location}, {self.category}, {self.cost_per_day}"
 
     @property
     def location(self):
