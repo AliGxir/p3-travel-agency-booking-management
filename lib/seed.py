@@ -41,11 +41,10 @@ def create_tables():
 def seed_tables():
     for _ in range(50):
         try:
-            # ipdb.set_trace()
             Destination.create(
                 location = sample(DESTINATIONS, 1)[0], 
                 category = sample(category, 1)[0], 
-                cost_per_day = str(fake.pyfloat(right_digits=2, positive=True, max_value=10000))
+                cost_per_day = fake.pyfloat(right_digits=2, positive=True, max_value=10000)
             )
             Client.create(
                 fake.name(),

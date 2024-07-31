@@ -70,15 +70,13 @@ class Booking:
         return self._end_date
 
     @end_date.setter
-    def end_date(self, end_date, start_date):
+    def end_date(self, end_date):
         if not isinstance(end_date, str):
             raise TypeError("End date must be in string format")
         elif not re.match(
             r"([0][1-9]|[1][0-2])\/([0][1-9]|[12][0-9]|[3][01])\/\d{4}", end_date
         ):
             raise ValueError("end_Date must be in the format MM/DD/YYYY")
-        elif end_date > start_date:
-            raise ValueError("end date must be after start date")
         self._end_date = end_date
 
     @property
@@ -184,7 +182,7 @@ class Booking:
     @classmethod
     def find_by_start_or_end_date(cls, start_date, end_date): 
         CURSOR.execute(
-            """" 
+            """
                 SELECT * FROM bookings
                 WHERE start_date is ? AND end_date is ?;
             """,
@@ -196,7 +194,7 @@ class Booking:
     # @classmethod
     # def find_by_total_price(cls, total_price):
     #     CURSOR.execute(
-    #         """" 
+    #         """ 
     #             SELECT * FROM bookings
     #             WHERE total_price is ?;
     #         """,
@@ -208,7 +206,7 @@ class Booking:
     @classmethod
     def find_by_id(cls, id):
         CURSOR.execute(
-            """" 
+            """
                 SELECT * FROM bookings
                 WHERE id is ?;
             """,
@@ -227,10 +225,10 @@ class Booking:
     def save(self):
         CURSOR.execute(
             """ 
-                INSERT INTO clients (name, start_date, end_date, category)
-                VALUES (?, ?, ?, ?);
+                INSERT INTO bookings (start_date, end_date, total_price, client_id, destination_id)
+                VALUES (?, ?, ?, ?, ?);
             """,
-                (self.name, self.start_date, self.end_date, self.category),
+                (self.start_date, self.end_date, self.total_price, self.client_id, self.destination_id),
         )
         CONN.commit()
         self.id = CURSOR.lastrowid
@@ -239,12 +237,12 @@ class Booking:
     
     def update(self):
         CURSOR.execute(
-            """" 
-                UPDATE clients
-                SET name = ?, start_date = ?, end_date = ?, category = ?
+            """
+                UPDATE bookings
+                SET start_date = ?, end_date = ?, total_price = ?
                 WHERE id = ?
             """, 
-                (self.name, self.start_date, self.end_date, self.category, self.id),
+                (self.start_date, self.end_date, self.total_price, self.id),
         )
         CONN.commit()
         type(self).all[self] = self
@@ -253,7 +251,7 @@ class Booking:
     def delete(self):
         CURSOR.execute(
             """ 
-                DELETE FROM clients
+                DELETE FROM bookings
                 WHERE id = ?
             """,
                 (self.id,),

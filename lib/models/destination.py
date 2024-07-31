@@ -45,14 +45,13 @@ class Destination:
 
     @cost_per_day.setter
     def cost_per_day(self, cost_per_day):
-        if not isinstance(cost_per_day, str):
+        if not isinstance(cost_per_day, float):
             raise TypeError("cost_per_day must be in float format")
-        elif re.match(r"[0-9]+\.[0-9]$", str(cost_per_day)):
-            self._cost_per_day = str(cost_per_day) + '0'
-        elif not re.match(r"[0-9]+\.[0-9]{2}", str(cost_per_day)):
-            raise ValueError("cost_per_day must be in the format of float with 2 decimal places")
-        else:
-            self._cost_per_day = cost_per_day
+        # elif re.match(r"[0-9]+\.[0-9]$", str(cost_per_day)):
+        #     self._cost_per_day = str(cost_per_day) + '0'
+        # elif not re.match(r"[0-9]+\.[0-9]{2}", str(cost_per_day)):
+        #     raise ValueError("cost_per_day must be in the format of float with 2 decimal places")
+        self._cost_per_day = cost_per_day
 
     # Association Methods
 
@@ -78,7 +77,7 @@ class Destination:
                         id INTEGER PRIMARY KEY,
                         location TEXT, 
                         category TEXT,
-                        cost_per_day TEXT
+                        cost_per_day FLOAT
                     );
                 """
             )
@@ -108,12 +107,12 @@ class Destination:
     def new_from_db(cls):
         CURSOR.execute(
             """ 
-                SELECT  * FROM destination
+                SELECT  * FROM destinations
                 ORDER BY id DESC
                 LIMIT 1;
             """
         )
-        row= CURSOR.fetchone()
+        row = CURSOR.fetchone()
         return cls(row[1], row[2], row[3], row[0])
     
     @classmethod
@@ -123,13 +122,13 @@ class Destination:
                 SELECT * FROM destinations;
             """
         )
-        rows= CURSOR.fetchall()
+        rows = CURSOR.fetchall()
         return [cls(row[1], row[2], row[3], row[0]) for row in rows]
     
     @classmethod
     def find_by_location(cls, location): 
         CURSOR.execute(
-            """" 
+            """
                 SELECT * FROM destinations
                 WHERE id is ?;
             """,
@@ -141,8 +140,8 @@ class Destination:
     @classmethod
     def find_by_id(cls, id):
         CURSOR.execute(
-            """" 
-                SELECT * FROM destination
+            """
+                SELECT * FROM destinations
                 WHERE id is ?;
             """,
                 (id,),
@@ -172,7 +171,7 @@ class Destination:
     
     def update(self):
         CURSOR.execute(
-            """" 
+            """
                 UPDATE destinations
                 SET location = ?, category = ?, cost_per_day = ?
                 WHERE id = ?
@@ -186,7 +185,7 @@ class Destination:
     def delete(self):
         CURSOR.execute(
             """ 
-                DELETE FROM clients
+                DELETE FROM destinations
                 WHERE id = ?
             """,
                 (self.id,),
