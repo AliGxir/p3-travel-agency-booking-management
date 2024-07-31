@@ -13,7 +13,6 @@ class Booking:
         self.total_price = total_price
         self.client_id = client_id
         self.destination_id = destination_id
-        self.id = self
 
     def __repr__(self):
         return (
@@ -71,13 +70,15 @@ class Booking:
         return self._end_date
 
     @end_date.setter
-    def end_date(self, end_date):
+    def end_date(self, end_date, start_date):
         if not isinstance(end_date, str):
             raise TypeError("End date must be in string format")
         elif not re.match(
             r"([0][1-9]|[1][0-2])\/([0][1-9]|[12][0-9]|[3][01])\/\d{4}", end_date
         ):
             raise ValueError("end_Date must be in the format MM/DD/YYYY")
+        elif end_date > start_date:
+            raise ValueError("end date must be after start date")
         self._end_date = end_date
 
     @property
@@ -88,10 +89,10 @@ class Booking:
     def total_price(self, total_price):
         if not isinstance(total_price, float):
             raise TypeError("Total price must be in float format")
-        elif not re.match(r"[0-9]+\.[0-9]{2}", total_price):
-            raise ValueError(
-                "Total price must be in the format of float with 2 decimal places"
-            )
+        # elif not re.match(r"[0-9]+\.[0-9]{2}", total_price):
+        #     raise ValueError(
+        #         "Total price must be in the format of float with 2 decimal places"
+            # )
         self._total_price = total_price
 
     #  Association Methods

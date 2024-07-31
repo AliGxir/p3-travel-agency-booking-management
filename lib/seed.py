@@ -1,8 +1,9 @@
 from models.booking import Booking
 from models.destination import Destination
 from models.client import Client
-from random import sample, choice
+from random import sample
 from faker import Faker
+import ipdb
 fake = Faker()
 
 DESTINATIONS = [
@@ -40,17 +41,18 @@ def create_tables():
 def seed_tables():
     for _ in range(50):
         try:
+            # ipdb.set_trace()
             Destination.create(
-                location = choice(DESTINATIONS), 
-                category = choice(category), 
-                cost_per_day = fake.random_number(digits=3)
+                location = sample(DESTINATIONS, 1)[0], 
+                category = sample(category, 1)[0], 
+                cost_per_day = str(fake.pyfloat(right_digits=2, positive=True, max_value=10000))
             )
             Client.create(
-                name = fake.name(),
-                start_date = fake.date_this_year(),
-                end_date = fake.date_this_year(),
-                category = choice(category),
-                destination = choice(DESTINATIONS),
+                fake.name(),
+                fake.date_this_year().strftime("%m/%d/%Y"),
+                fake.date_this_year().strftime("%m/%d/%Y"),
+                sample(category, 1)[0],
+                sample(DESTINATIONS, 1)[0],
             )
             print("Created destination and client")
         except Exception as e:
@@ -60,10 +62,11 @@ def seed_tables():
         try:
             destinations = Destination.get_all()
             clients = Client.get_all()
+            # ipdb.set_trace()
             Booking.create(
-                start_date = fake.date_this_year(),
-                end_date = fake.date_this_year(),
-                total_price = fake.random_number(digits=3),
+                start_date = fake.date_this_year().strftime("%m/%d/%Y"),
+                end_date = fake.date_this_year().strftime("%m/%d/%Y"),
+                total_price = fake.pyfloat(right_digits=2, positive=True, max_value=10000),
                 client_id = sample(clients, 1)[0].id,
                 destination_id = sample(destinations, 1)[0].id
             )
@@ -80,4 +83,4 @@ if __name__ == "__main__":
     seed_tables()
     print("Seed data complete!")
     # import ipdb
-    # ipdb.set_trace()
+

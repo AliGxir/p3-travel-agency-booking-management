@@ -4,14 +4,14 @@ import re
 class Destination:
     all = {}
 
-    def __init__(self, location, category, cost_per_day):
+    def __init__(self, location, category, cost_per_day, id=None):
         self.location = location
         self.category = category
         self.cost_per_day = cost_per_day
-        self.id = self
+        self.id = id
 
     def __repr__(self):
-        return f"<Client {self.id}: {self.location}, {self.category}, {self.cost_per_day}"
+        return f"<Destination{self.id}: {self.location}, {self.category}, {self.cost_per_day}"
 
     @property
     def location(self):
@@ -19,8 +19,8 @@ class Destination:
 
     @location.setter
     def location(self, location):
-        if isinstance(location, str):
-            raise TypeError("name must be in string format")
+        if not isinstance(location, str):
+            raise TypeError("location must be in string format")
         elif not re.match(r"^[a-zA-Z]+(?:\s[a-zA-Z]+)?$", location):
             raise ValueError("Please fill out location")
         self._location = location
@@ -31,9 +31,9 @@ class Destination:
 
     @category.setter
     def category(self, category):
-        if not isinstance(self, category):
+        if not isinstance(category, str):
             raise TypeError("category must be in string format")
-        elif not ("nature", "history", "food", "excursion"):
+        elif category not in ("nature", "historic", "food", "excursion"):
             raise ValueError(
                 "category must be one of the options of: nature, history, food, or excursion"
             )
@@ -45,11 +45,14 @@ class Destination:
 
     @cost_per_day.setter
     def cost_per_day(self, cost_per_day):
-        if not isinstance(cost_per_day, float):
+        if not isinstance(cost_per_day, str):
             raise TypeError("cost_per_day must be in float format")
-        elif not re.match(r"[0-9]+\.[0-9]{2}", cost_per_day):
+        elif re.match(r"[0-9]+\.[0-9]$", str(cost_per_day)):
+            self._cost_per_day = str(cost_per_day) + '0'
+        elif not re.match(r"[0-9]+\.[0-9]{2}", str(cost_per_day)):
             raise ValueError("cost_per_day must be in the format of float with 2 decimal places")
-        self._cost_per_day = cost_per_day
+        else:
+            self._cost_per_day = cost_per_day
 
     # Association Methods
 
@@ -57,7 +60,7 @@ class Destination:
         CURSOR.execute(
             """
             SELECT * FROM bookings
-            WHERE client_id = ?
+            WHERE destination_id = ?
         """,
             (self.id,),
         )
@@ -75,7 +78,7 @@ class Destination:
                         id INTEGER PRIMARY KEY,
                         location TEXT, 
                         category TEXT,
-                        cost_per_day FLOAT
+                        cost_per_day TEXT
                     );
                 """
             )
@@ -157,7 +160,7 @@ class Destination:
     def save(self):
         CURSOR.execute(
             """ 
-                INSERT INTO clients (location, category, cost_per_day)
+                INSERT INTO destinations (location, category, cost_per_day)
                 VALUES (?, ?, ?);
             """,
                 (self.location, self.category, self.cost_per_day),

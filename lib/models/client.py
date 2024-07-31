@@ -46,13 +46,15 @@ class Client:
         return self._end_date
 
     @end_date.setter
-    def end_date(self, end_date):
+    def end_date(self, end_date, start_date):
         if not isinstance(end_date, str):
             raise TypeError("End date must be in string format")
         elif not re.match(
             r"([0][1-9]|[1][0-2])\/([0][1-9]|[12][0-9]|[3][01])\/\d{4}", end_date
         ):
             raise ValueError("end_Date must be in the format MM/DD/YYYY")
+        elif end_date > start_date:
+            raise ValueError("end date must be after start date")
         self._end_date = end_date
 
     @property
