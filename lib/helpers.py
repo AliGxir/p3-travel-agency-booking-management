@@ -14,16 +14,16 @@ def menu():
     print("4. Find a client by name")
     print("5. Find a destination by location")
     print("6. Find an booking by start_date or end_date")
-    print("7. Create a new client")
-    print("8. Create a new destination")
-    print("9. Create a new booking")
-    print("10. Update a client")
-    print("11. Update a destination")
-    print("12. Update an booking")
-    print("13. Delete a client")
-    print("14. Delete a destination")
-    print("15. Delete an booking")
-    print("16. Find destinations by client's name")
+    print("7. Find destinations by client's name")
+    print("8. Create a new client")
+    print("9. Create a new destination")
+    print("10. Create a new booking")
+    print("11. Update a client")
+    print("12. Update a destination")
+    print("13. Update an booking")
+    print("14. Delete a client")
+    print("15. Delete a destination")
+    print("16. Delete an booking")
     print("17. Exit")
 
 
@@ -83,6 +83,17 @@ def find_booking_by_start_date_or_end_date():
         print(booking) if booking else print("No bookings found")
     else:
         print("Invalid start/end date")
+
+
+def find_destinations_by_client_name():
+    name = input("Enter the client's name ")
+    if name and re.match(r"^[a-zA-Z ]+$", name) and name.title():
+        if client := Client.find_by_name(name.title()):
+            destinations = client.destinations()
+            for destination in destinations:
+                print(destination())
+    else:
+        print("Invalid name")
 
 
 def create_client():
@@ -163,12 +174,15 @@ def create_booking():
 
 
 def update_client_by_id(id, name, start_date, end_date, category):
-    client = Client.find_by_id(id)
-    client.name = name.title()
-    client.start_date = start_date
-    client.end_date = end_date
-    client.category = category
-    client = client.update()
+    try:
+        client = Client.find_by_id(id)
+        client.name = name.title()
+        client.start_date = start_date
+        client.end_date = end_date
+        client.category = category
+        client = client.update()
+    except Exception as e:
+        return e
     print(client)
 
 
@@ -198,11 +212,14 @@ def update_client():
 
 
 def update_destination_by_id(id, location, category, cost_per_day):
-    destination = Destination.find_by_id(id)
-    destination.location = location.title()
-    destination.category = category
-    destination.cost_per_day_day = cost_per_day
-    destination = destination.update()
+    try:
+        destination = Destination.find_by_id(id)
+        destination.location = location.title()
+        destination.category = category
+        destination.cost_per_day_day = cost_per_day
+        destination = destination.update()
+    except Exception as e:
+        return e
     print(destination)
 
 
@@ -315,8 +332,11 @@ def delete_destination():
 
 
 def delete_booking_by_id(id):
-    booking = Booking.find_by_id(id)
-    booking = booking.delete()
+    try:
+        booking = Booking.find_by_id(id)
+        booking = booking.delete()
+    except Exception as e:
+        return e
     print(booking)
 
 
@@ -331,25 +351,9 @@ def delete_booking():
         print("Invalid id")
 
 
-def find_destinations_by_client_name():
-    name = input("Enter the client's name ")
-    if name and re.match(r"^[a-zA-Z ]+$", name) and name.title():
-        if client := Client.find_by_name(name.title()):
-            destinations = client.destinations()
-            for destination in destinations:
-                print(destination())
-    else:
-        print("Invalid name")
-
-
 def exit_program():
     print("Goodbye!")
     exit()
-
-    # elif not re.match(r"[0-9]+\.[0-9]{2}", total_price):
-    #     raise ValueError(
-    #         "Total price must be in the format of float with 2 decimal places"
-    # )
 
 
 from models.client import Client

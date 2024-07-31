@@ -1,5 +1,3 @@
-# lib/cli.py
-
 from helpers import (
     welcome,
     menu,
@@ -19,8 +17,9 @@ from helpers import (
     delete_destination,
     delete_booking,
     find_destinations_by_client_name,
-    exit_program
+    exit_program,
 )
+
 
 class CLI:
     def main(self):
@@ -65,7 +64,8 @@ class CLI:
                 break
             else:
                 print("Invalid choice")
-            
+
+
 if __name__ == "__main__":
     cli = CLI()
     cli.main()
