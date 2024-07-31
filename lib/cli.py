@@ -6,7 +6,7 @@ from helpers import (
     list_bookings,
     find_client_by_name,
     find_destination_by_location,
-    find_booking_by_id,
+    find_booking_by_client_id,
     create_client,
     create_destination,
     create_booking,
@@ -38,27 +38,27 @@ class CLI:
             elif choice == "5":
                 find_destination_by_location()
             elif choice == "6":
-                find_booking_by_id()
+                find_booking_by_client_id()
             elif choice == "7":
-                create_client()
-            elif choice == "8":
-                create_destination()
-            elif choice == "9":
-                create_booking()
-            elif choice == "10":
-                update_client()
-            elif choice == "11":
-                update_destination()
-            elif choice == "12":
-                update_booking()
-            elif choice == "13":
-                delete_client()
-            elif choice == "14":
-                delete_destination()
-            elif choice == "15":
-                delete_booking()
-            elif choice == "16":
                 find_destinations_by_client_name()
+            elif choice == "8":
+                create_client()
+            elif choice == "9":
+                create_destination()
+            elif choice == "10":
+                create_booking()
+            elif choice == "11":
+                update_client()
+            elif choice == "12":
+                update_destination()
+            elif choice == "13":
+                update_booking()
+            elif choice == "14":
+                delete_client()
+            elif choice == "15":
+                delete_destination()
+            elif choice == "16":
+                delete_booking()
             elif choice == "17":
                 exit_program()
                 break

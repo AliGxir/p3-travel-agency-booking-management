@@ -93,7 +93,7 @@ class Client:
             "San Francisco",
         ):
             raise ValueError(
-                "destination must be one of the options of: Oahu, Rome, Paris,Tokyo,Amsterdam, Singapore, Bangkok, Hong Kong, New York, San Francisco"
+                "destination must be one of the options of: Oahu, Rome, Paris, Tokyo, Amsterdam, Singapore, Bangkok, Hong Kong, New York, San Francisco"
             )
         self._destination = destination
 

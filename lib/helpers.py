@@ -13,7 +13,7 @@ def menu():
     print("3. List all bookings")
     print("4. Find a client by name")
     print("5. Find a destination by location")
-    print("6. Find an booking by start_date or end_date")
+    print("6. Find an booking by client's id")
     print("7. Find destinations by client's name")
     print("8. Create a new client")
     print("9. Create a new destination")
@@ -91,37 +91,43 @@ def find_booking_by_client_id():
 
 
 def find_destinations_by_client_name():
-    name = input("Enter the client's name ")
-    if name and re.match(r"^[a-zA-Z ]+$", name) and name.title():
-        if client := Client.find_by_name(name.title()):
-            destinations = client.destinations()
-            for destination in destinations:
-                print(destination())
-    else:
-        print("Invalid name")
+    name = input("Enter the client's name: ").strip().title()
+    try:
+        if name and re.match(r"^[a-zA-Z ]+$", name):
+            client = Client.find_by_name(name)
+            if client:
+                    print(client.destination)
+            else:
+                print("No client found with that name")
+        else:
+            print("Invalid name: Please enter a valid name")
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
 
 def create_client():
-    name = input("Enter the client's name: (i.e. Alicia)")
+    name = input("Enter the client's name (i.e. Alicia): ")
     start_date = input("Enter the start date of your trip (MM/DD/YYYY): ")
     end_date = input("Enter the end date of your trip (MM/DD/YYYY): ")
-    category = input("Enter the category of your interest: (from the list)")
+    category = input("Enter the category of your interest (from the list): ")
+    destination = input("Enter the destination (from the list): ")
     if (
         isinstance(name, str)
         and isinstance(start_date, str)
         and isinstance(end_date, str)
         and isinstance(category, str)
+        and isinstance(destination, str)
         and len(name)
         and len(start_date)
         and len(end_date)
         and len(category)
     ):
         try:
-            client = Client.create(name.title(), start_date, end_date, category.title())
+            client = Client.create(name.title(), start_date, end_date, category, destination)
+            print("Successfully created new client!")
             print(client)
         except Exception as e:
             print("Error in creating a new client: ", e)
-    print("Invalid name, start date, end date, or category")
 
 
 def create_destination():

@@ -177,14 +177,14 @@ class Booking:
         return [cls(row[1], row[2], row[3], row[4], row[5], row[0]) for row in rows]
 
     @classmethod
-    def find_by_start_or_end_date(cls, start_date, end_date):
+    def find_by_client_id(cls, client_id):
         try:
             CURSOR.execute(
                 """
                     SELECT * FROM bookings
-                    WHERE start_date is ? AND end_date is ?;
+                    WHERE client_id is ?;
                 """,
-                (start_date, end_date),
+                (client_id,),
             )
             row = CURSOR.fetchone()
         except Exception as e:
@@ -246,7 +246,7 @@ class Booking:
                 """
                     UPDATE bookings
                     SET start_date = ?, end_date = ?, total_price = ?
-                    WHERE id = ?
+                    WHERE id = ?;
                 """,
                 (self.start_date, self.end_date, self.total_price, self.id),
             )
