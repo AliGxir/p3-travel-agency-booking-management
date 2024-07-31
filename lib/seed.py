@@ -3,6 +3,7 @@ from models.destination import Destination
 from models.client import Client
 from random import sample
 from faker import Faker
+import datetime
 import ipdb
 fake = Faker()
 
@@ -36,7 +37,18 @@ def create_tables():
     Booking.create_table()
     Client.create_table()
     Destination.create_table()
-
+    
+# def generate_date_range():
+#     for _ in range(1):
+#         start_date = fake.date_this_year()
+#         end_date = fake.date_this_year()
+#         if start_date > end_date:
+#             temp_date = start_date
+#             start_date = end_date
+#             end_date = temp_date
+#         elif start_date is end_date:
+#             end_date + datetime.timedelta(days=1)            
+#     return start_date.strftime("%m/%d/%Y"), end_date.strftime("%m/%d/%Y")
 
 def seed_tables():
     for _ in range(50):
@@ -61,13 +73,12 @@ def seed_tables():
         try:
             destinations = Destination.get_all()
             clients = Client.get_all()
-            # ipdb.set_trace()
             Booking.create(
-                start_date = fake.date_this_year().strftime("%m/%d/%Y"),
-                end_date = fake.date_this_year().strftime("%m/%d/%Y"),
-                total_price = fake.pyfloat(right_digits=2, positive=True, max_value=10000),
-                client_id = sample(clients, 1)[0].id,
-                destination_id = sample(destinations, 1)[0].id
+                fake.date_this_year().strftime("%m/%d/%Y"),
+                fake.date_this_year().strftime("%m/%d/%Y"),
+                fake.pyfloat(right_digits=2, positive=True, max_value=10000),
+                sample(clients, 1)[0].id,
+                sample(destinations, 1)[0].id
             )
             print("Created booking")
         except Exception as e:
@@ -81,5 +92,5 @@ if __name__ == "__main__":
     print("Tables created!")
     seed_tables()
     print("Seed data complete!")
-    # import ipdb
+    import ipdb
 

@@ -33,7 +33,7 @@ class Booking:
             raise TypeError("Client_id must be an integer")
         elif client_id < 1 or not Client.find_by_id(client_id):
             raise ValueError(
-                "Client_id must be a positive integer pointing to an existing client"
+                "client_id must be a positive integer pointing to an existing client"
             )
         self._client_id = client_id
 
@@ -44,10 +44,10 @@ class Booking:
     @destination_id.setter
     def destination_id(self, destination_id):
         if not isinstance(destination_id, int):
-            raise TypeError("Destination_id must be an integer")
+            raise TypeError("destination_id must be an integer")
         elif destination_id < 1 or not Destination.find_by_id(destination_id):
             raise ValueError(
-                "Destination_id must be a positive integer pointing to an existing destination"
+                "destination_id must be a positive integer pointing to an existing destination"
             )
         self._destination_id = destination_id
 
@@ -58,11 +58,11 @@ class Booking:
     @start_date.setter
     def start_date(self, start_date):
         if not isinstance(start_date, str):
-            raise TypeError("Start date must be in string format")
+            raise TypeError("start_date must be in string format")
         elif not re.match(
             r"([0][1-9]|[1][0-2])\/([0][1-9]|[12][0-9]|[3][01])\/\d{4}", start_date
         ):
-            raise ValueError("start_Date must be in the format MM/DD/YYYY")
+            raise ValueError("start_date must be in the format MM/DD/YYYY")
         self._start_date = start_date
 
     @property
@@ -72,11 +72,13 @@ class Booking:
     @end_date.setter
     def end_date(self, end_date):
         if not isinstance(end_date, str):
-            raise TypeError("End date must be in string format")
+            raise TypeError("end_date must be in string format")
         elif not re.match(
             r"([0][1-9]|[1][0-2])\/([0][1-9]|[12][0-9]|[3][01])\/\d{4}", end_date
         ):
-            raise ValueError("end_Date must be in the format MM/DD/YYYY")
+            raise ValueError("end_date must be in the format MM/DD/YYYY")
+        elif self.start_date > end_date:
+            raise ValueError("start_date must be before end_date")
         self._end_date = end_date
 
     @property
@@ -86,7 +88,7 @@ class Booking:
     @total_price.setter
     def total_price(self, total_price):
         if not isinstance(total_price, float):
-            raise TypeError("Total price must be in float format")
+            raise TypeError("total_price must be in float format")
         # elif not re.match(r"[0-9]+\.[0-9]{2}", total_price):
         #     raise ValueError(
         #         "Total price must be in the format of float with 2 decimal places"
@@ -106,13 +108,13 @@ class Booking:
 
 
     # Helper Methods
-    def compare_dates(start_date, end_date):
-        date1 = start_date()
-        date2 = end_date()
-        if date1 > date2:
-            raise ValueError("start date must be before end date")
-        elif date1 is date2:
-            raise ValueError("start and end date cannot be the same date")
+    # def compare_dates(start_date, end_date):
+    #     date1 = start_date()
+    #     date2 = end_date()
+    #     if date1 > date2:
+    #         raise ValueError("start date must be before end date")
+    #     elif date1 is date2:
+    #         raise ValueError("start and end date cannot be the same date")
         
     # creating tables should follow the order of clients, destinations, then bookings
     # dropping tables will go in the order opposite of creation

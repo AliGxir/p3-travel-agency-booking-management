@@ -53,6 +53,8 @@ class Client:
             r"([0][1-9]|[1][0-2])\/([0][1-9]|[12][0-9]|[3][01])\/\d{4}", end_date
         ):
             raise ValueError("end_Date must be in the format MM/DD/YYYY")
+        elif self.start_date > end_date:
+            raise ValueError("start_date must be before end_date")
         self._end_date = end_date
 
     @property
@@ -111,13 +113,13 @@ class Client:
             return e
         
     # Helper Methods
-    def compare_dates(start_date, end_date):
-        date1 = start_date()
-        date2 = end_date()
-        if date1 > date2:
-            raise ValueError("start date must be before end date")
-        elif date1 is date2:
-            raise ValueError("start and end date cannot be the same date")
+    # def compare_dates(start_date, end_date):
+    #     date1 = start_date()
+    #     date2 = end_date()
+    #     if date1 > date2:
+    #         raise ValueError("start date must be before end date")
+    #     elif date1 is date2:
+    #         raise ValueError("start and end date cannot be the same date")
         
     # Utility ORM Methods
     @classmethod
