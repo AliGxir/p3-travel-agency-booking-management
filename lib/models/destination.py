@@ -35,7 +35,7 @@ class Destination:
             raise TypeError("category must be in string format")
         elif category not in ("nature", "historic", "food", "excursion"):
             raise ValueError(
-                "category must be one of the options of: nature, history, food, or excursion"
+                "category must be one of the options of: nature, historic, food, or excursion"
             )
         self._category = category
 

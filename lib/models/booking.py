@@ -106,11 +106,13 @@ class Booking:
 
 
     # Helper Methods
-    def in_the_future_start_date(self, start_date):
-        pass
-    
-    def in_the_future_end_date(self, end_date):
-        pass
+    def compare_dates(start_date, end_date):
+        date1 = start_date()
+        date2 = end_date()
+        if date1 > date2:
+            raise ValueError("start date must be before end date")
+        elif date1 is date2:
+            raise ValueError("start and end date cannot be the same date")
         
     # creating tables should follow the order of clients, destinations, then bookings
     # dropping tables will go in the order opposite of creation
