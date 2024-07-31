@@ -30,7 +30,7 @@ class Booking:
     @client_id.setter
     def client_id(self, client_id):
         if not isinstance(client_id, int):
-            raise TypeError("Client_id must be an integer")
+            raise TypeError("client_id must be an integer")
         elif client_id < 1 or not Client.find_by_id(client_id):
             raise ValueError(
                 "client_id must be a positive integer pointing to an existing client"
@@ -89,36 +89,20 @@ class Booking:
     def total_price(self, total_price):
         if not isinstance(total_price, float):
             raise TypeError("total_price must be in float format")
-        # elif not re.match(r"[0-9]+\.[0-9]{2}", total_price):
-        #     raise ValueError(
-        #         "Total price must be in the format of float with 2 decimal places"
-            # )
         self._total_price = total_price
 
-    #  Association Methods
+    # Association Methods
     def client(self):
-        pass
         return Client.find_by_id(self.client_id) if self.client_id else None
 
     def destination(self):
-        pass
         return (
             Destination.find_by_id(self.destination_id) if self.destination_id else None
         )
 
+    # Note: creating tables should follow the order of clients, destinations, then bookings
+    # Note: dropping tables will go in the order opposite of creation
 
-    # Helper Methods
-    # def compare_dates(start_date, end_date):
-    #     date1 = start_date()
-    #     date2 = end_date()
-    #     if date1 > date2:
-    #         raise ValueError("start date must be before end date")
-    #     elif date1 is date2:
-    #         raise ValueError("start and end date cannot be the same date")
-        
-    # creating tables should follow the order of clients, destinations, then bookings
-    # dropping tables will go in the order opposite of creation
-    
     # Utility ORM Class Methods
     @classmethod
     def create_table(cls):
@@ -152,118 +136,142 @@ class Booking:
         except Exception as e:
             CONN.rollback()
             return e
-        
+
     @classmethod
     def create(cls, start_date, end_date, total_price, client_id, destination_id):
         new_booking = cls(start_date, end_date, total_price, client_id, destination_id)
         new_booking.save()
         return new_booking
-    
+
     @classmethod
     def new_from_db(cls):
-        CURSOR.execute(
-            """ 
-                SELECT  * FROM bookings
-                ORDER BY id DESC
-                LIMIT 1;
-            """
-        )
-        row= CURSOR.fetchone()
-        booking = cls(row[1], row[2], row[3], row[4], row[5], row[0])
-        cls.all[booking.id] = booking
+        try: 
+            CURSOR.execute(
+                """ 
+                    SELECT  * FROM bookings
+                    ORDER BY id DESC
+                    LIMIT 1;
+                """
+            )
+            row = CURSOR.fetchone()
+            booking = cls(row[1], row[2], row[3], row[4], row[5], row[0])
+            cls.all[booking.id] = booking
+        except Exception as e:
+            CONN.rollback()
+            return e
         return booking
-    
+
     @classmethod
     def get_all(cls):
-        CURSOR.execute(
-            """ 
-                SELECT * FROM bookings;
-            """
-        )
-        rows= CURSOR.fetchall()
+        try:
+            CURSOR.execute(
+                """ 
+                    SELECT * FROM bookings;
+                """
+                )
+            rows = CURSOR.fetchall()
+        except Exception as e:
+            CONN.rollback()
+            return e
         return [cls(row[1], row[2], row[3], row[4], row[5], row[0]) for row in rows]
-    
+
     @classmethod
-    def find_by_start_or_end_date(cls, start_date, end_date): 
-        CURSOR.execute(
-            """
-                SELECT * FROM bookings
-                WHERE start_date is ? AND end_date is ?;
-            """,
+    def find_by_start_or_end_date(cls, start_date, end_date):
+        try:
+            CURSOR.execute(
+                """
+                    SELECT * FROM bookings
+                    WHERE start_date is ? AND end_date is ?;
+                """,
                 (start_date, end_date),
-        )
-        row = CURSOR.fetchone()
+            )
+            row = CURSOR.fetchone()
+        except Exception as e:
+            CONN.rollback()
+            return e
         return cls(row[1], row[2], row[3], row[4], row[5], row[0]) if row else None
-    
-    # @classmethod
-    # def find_by_total_price(cls, total_price):
-    #     CURSOR.execute(
-    #         """ 
-    #             SELECT * FROM bookings
-    #             WHERE total_price is ?;
-    #         """,
-    #             (total_price,),
-    #     )
-    #     row = CURSOR.fetchone()
-    #     return cls(row[1],  row[2], row[3], row[4], row[5], row[0]) if row else None
-    
+
     @classmethod
     def find_by_id(cls, id):
-        CURSOR.execute(
-            """
-                SELECT * FROM bookings
-                WHERE id is ?;
-            """,
+        try:
+            CURSOR.execute(
+                """
+                    SELECT * FROM bookings
+                    WHERE id is ?;
+                """,
                 (id,),
-        )
-        row = CURSOR.fetchone()
-        return cls(row[1],  row[2], row[3], row[4], row[5], row[0]) if row else None
-    
+            )
+            row = CURSOR.fetchone()
+        except Exception as e:
+            CONN.rollback()
+            return e
+        return cls(row[1], row[2], row[3], row[4], row[5], row[0]) if row else None
+
     @classmethod
-    def find_or_create_by(cls, start_date, end_date, total_price, client_id, destination_id):
+    def find_or_create_by(
+        cls, start_date, end_date, total_price, client_id, destination_id
+    ):
         return cls.find_by_start_or_end_date(start_date, end_date) or cls.create(
             start_date, end_date, total_price, client_id, destination_id
         )
-        
+
     # Utility ORM Instance Methods
     def save(self):
-        CURSOR.execute(
-            """ 
-                INSERT INTO bookings (start_date, end_date, total_price, client_id, destination_id)
-                VALUES (?, ?, ?, ?, ?);
-            """,
-                (self.start_date, self.end_date, self.total_price, self.client_id, self.destination_id),
-        )
-        CONN.commit()
-        self.id = CURSOR.lastrowid
-        type(self).all[self.id] = self
+        try:
+            CURSOR.execute(
+                """ 
+                    INSERT INTO bookings (start_date, end_date, total_price, client_id, destination_id)
+                    VALUES (?, ?, ?, ?, ?);
+                """,
+                (
+                    self.start_date,
+                    self.end_date,
+                    self.total_price,
+                    self.client_id,
+                    self.destination_id,
+                ),
+            )
+            CONN.commit()
+            self.id = CURSOR.lastrowid
+            type(self).all[self.id] = self
+        except Exception as e:
+            CONN.rollback()
+            return e 
         return self
-    
+
     def update(self):
-        CURSOR.execute(
-            """
-                UPDATE bookings
-                SET start_date = ?, end_date = ?, total_price = ?
-                WHERE id = ?
-            """, 
+        try:
+            CURSOR.execute(
+                """
+                    UPDATE bookings
+                    SET start_date = ?, end_date = ?, total_price = ?
+                    WHERE id = ?
+                """,
                 (self.start_date, self.end_date, self.total_price, self.id),
-        )
-        CONN.commit()
-        type(self).all[self] = self
+            )
+            CONN.commit()
+            type(self).all[self] = self
+        except Exception as e:
+            CONN.rollback()
+            return e
         return self
-    
+
     def delete(self):
-        CURSOR.execute(
-            """ 
-                DELETE FROM bookings
-                WHERE id = ?
-            """,
+        try:
+            CURSOR.execute(
+                """ 
+                    DELETE FROM bookings
+                    WHERE id = ?
+                """,
                 (self.id,),
-        )
-        CONN.commit()
-        del type(self).all[self.id]
-        self.id = None
+            )
+            CONN.commit()
+            del type(self).all[self.id]
+            self.id = None
+        except Exception as e:
+            CONN.rollback()
+            return e
         return self
-    
+
 from models.client import Client
 from models.destination import Destination

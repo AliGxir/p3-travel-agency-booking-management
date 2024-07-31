@@ -22,7 +22,7 @@ class Destination:
         if not isinstance(location, str):
             raise TypeError("location must be in string format")
         elif not re.match(r"^[a-zA-Z]+(?:\s[a-zA-Z]+)?$", location):
-            raise ValueError("Please fill out location")
+            raise ValueError("Please fill out location from the DESTINATIONS list")
         self._location = location
 
     @property
@@ -47,27 +47,25 @@ class Destination:
     def cost_per_day(self, cost_per_day):
         if not isinstance(cost_per_day, float):
             raise TypeError("cost_per_day must be in float format")
-        # elif re.match(r"[0-9]+\.[0-9]$", str(cost_per_day)):
-        #     self._cost_per_day = str(cost_per_day) + '0'
-        # elif not re.match(r"[0-9]+\.[0-9]{2}", str(cost_per_day)):
-        #     raise ValueError("cost_per_day must be in the format of float with 2 decimal places")
         self._cost_per_day = cost_per_day
 
     # Association Methods
-
     def bookings(self):
-        CURSOR.execute(
-            """
-            SELECT * FROM bookings
-            WHERE destination_id = ?
-        """,
-            (self.id,),
-        )
-        rows = CURSOR.fetchall()
+        try:
+            CURSOR.execute(
+                """
+                SELECT * FROM bookings
+                WHERE destination_id = ?
+            """,
+                (self.id,),
+            )
+            rows = CURSOR.fetchall()
+        except Exception as e:
+            CONN.rollback()
+            return e
         return [Booking(row[1], row[2], row[3], row[0]) for row in rows]
 
     # Utility ORM Methods
-
     @classmethod
     def create_table(cls):
         try:
@@ -83,6 +81,7 @@ class Destination:
             )
             CONN.commit()
         except Exception as e:
+            CONN.rollback()
             return e
 
     @classmethod
@@ -95,6 +94,7 @@ class Destination:
             )
             CONN.commit()
         except Exception as e:
+            CONN.rollback()
             return e
 
     @classmethod
@@ -105,48 +105,64 @@ class Destination:
 
     @classmethod
     def new_from_db(cls):
-        CURSOR.execute(
-            """ 
-                SELECT  * FROM destinations
-                ORDER BY id DESC
-                LIMIT 1;
-            """
-        )
-        row = CURSOR.fetchone()
+        try:
+            CURSOR.execute(
+                """ 
+                    SELECT  * FROM destinations
+                    ORDER BY id DESC
+                    LIMIT 1;
+                """
+            )
+            row = CURSOR.fetchone()
+        except Exception as e:
+            CONN.rollback()
+            return e
         return cls(row[1], row[2], row[3], row[0])
     
     @classmethod
     def get_all(cls):
-        CURSOR.execute(
-            """ 
-                SELECT * FROM destinations;
-            """
-        )
-        rows = CURSOR.fetchall()
+        try:
+            CURSOR.execute(
+                """ 
+                    SELECT * FROM destinations;
+                """
+            )
+            rows = CURSOR.fetchall()
+        except Exception as e:
+            CONN.rollback()
+            return e
         return [cls(row[1], row[2], row[3], row[0]) for row in rows]
     
     @classmethod
     def find_by_location(cls, location): 
-        CURSOR.execute(
-            """
-                SELECT * FROM destinations
-                WHERE id is ?;
-            """,
-                (location,),
-        )
-        row = CURSOR.fetchone()
+        try:
+            CURSOR.execute(
+                """
+                    SELECT * FROM destinations
+                    WHERE id is ?;
+                """,
+                    (location,),
+            )
+            row = CURSOR.fetchone()
+        except Exception as e:
+            CONN.rollback()
+            return e
         return cls(row[1], row[2], row[3], row[0]) if row else None
     
     @classmethod
     def find_by_id(cls, id):
-        CURSOR.execute(
-            """
-                SELECT * FROM destinations
-                WHERE id is ?;
-            """,
-                (id,),
-        )
-        row = CURSOR.fetchone()
+        try:
+            CURSOR.execute(
+                """
+                    SELECT * FROM destinations
+                    WHERE id is ?;
+                """,
+                    (id,),
+            )
+            row = CURSOR.fetchone()
+        except Exception as e:
+            CONN.rollback()
+            return e
         return cls(row[1],  row[2], row[3], row[0]) if row else None
     
     @classmethod
@@ -157,42 +173,54 @@ class Destination:
         
     # Utility ORM Instance Methods
     def save(self):
-        CURSOR.execute(
-            """ 
-                INSERT INTO destinations (location, category, cost_per_day)
-                VALUES (?, ?, ?);
-            """,
-                (self.location, self.category, self.cost_per_day),
-        )
-        CONN.commit()
-        self.id = CURSOR.lastrowid
-        type(self).all[self.id] = self
+        try:
+            CURSOR.execute(
+                """ 
+                    INSERT INTO destinations (location, category, cost_per_day)
+                    VALUES (?, ?, ?);
+                """,
+                    (self.location, self.category, self.cost_per_day),
+            )
+            CONN.commit()
+            self.id = CURSOR.lastrowid
+            type(self).all[self.id] = self
+        except Exception as e:
+            CONN.rollback()
+            return e
         return self
     
     def update(self):
-        CURSOR.execute(
-            """
-                UPDATE destinations
-                SET location = ?, category = ?, cost_per_day = ?
-                WHERE id = ?
-            """, 
-                (self.location, self.category, self.cost_per_day, self.id),
-        )
-        CONN.commit()
-        type(self).all[self] = self
+        try:
+            CURSOR.execute(
+                """
+                    UPDATE destinations
+                    SET location = ?, category = ?, cost_per_day = ?
+                    WHERE id = ?
+                """, 
+                    (self.location, self.category, self.cost_per_day, self.id),
+            )
+            CONN.commit()
+            type(self).all[self] = self
+        except Exception as e:
+            CONN.rollback()
+            return e
         return self
     
     def delete(self):
-        CURSOR.execute(
-            """ 
-                DELETE FROM destinations
-                WHERE id = ?
-            """,
-                (self.id,),
-        )
-        CONN.commit()
-        del type(self).all[self.id]
-        self.id = None
+        try:
+            CURSOR.execute(
+                """ 
+                    DELETE FROM destinations
+                    WHERE id = ?
+                """,
+                    (self.id,),
+            )
+            CONN.commit()
+            del type(self).all[self.id]
+            self.id = None
+        except Exception as e:
+            CONN.rollback()
+            return e
         return self
     
 from models.booking import Booking 
