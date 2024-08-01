@@ -2,7 +2,8 @@
 
 ## Learning Goals
 
-- Discuss the basic directory structure of a CLI.
+- The basic structure of the CLI are a welcome message, then a menu of options of listing classes, then finding an object by attribute, creating a new object, updating an existing object, and deleting an object. 
+
 - Outline the first steps in building a CLI.
 
 ---

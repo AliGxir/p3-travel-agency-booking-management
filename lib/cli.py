@@ -7,6 +7,7 @@ from helpers import (
     find_client_by_name,
     find_destination_by_location,
     find_booking_by_client_id,
+    find_destinations_by_client_name,
     create_client,
     create_destination,
     create_booking,
@@ -16,7 +17,6 @@ from helpers import (
     delete_client,
     delete_destination,
     delete_booking,
-    find_destinations_by_client_name,
     exit_program,
 )
 
