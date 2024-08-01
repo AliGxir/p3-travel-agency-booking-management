@@ -64,11 +64,11 @@ def find_client_by_name():
 
 def find_destination_by_location():
     print("Available Destinations:")
-    for index, destination in enumerate(DESTINATIONS, start=1):
+    for index, destination in enumerate(Destination.destination_list(), start=1):
         print(f"{index}. {destination}")
     choice = input("Enter the number corresponding to your destination: ")
-    if choice.isdigit() and 1 <= int(choice) <= len(DESTINATIONS):
-        selected_destination = DESTINATIONS[int(choice) - 1]
+    if choice.isdigit() and 1 <= int(choice) <= len(Destination.destination_list()):
+        selected_destination = Destination.destination_list()[int(choice) - 1]
         print(f"Destination selected: {selected_destination}")
     else:
         print("Invalid selection. Please enter a valid number.")
@@ -109,7 +109,14 @@ def create_client():
     name = input("Enter the client's name (i.e. Alicia): ").strip()
     start_date = input("Enter the start date of your trip (MM/DD/YYYY): ").strip()
     end_date = input("Enter the end date of your trip (MM/DD/YYYY): ").strip()
+    print("Please select from the list:")
+    print(*Destination.category_list())
+    print()
     category = input("Enter the category of your interest (from the list): ").strip()
+    print()
+    print("Please select from the list:")
+    print(*Destination.destination_list())
+    print()
     destination = input("Enter the destination (from the list): ").strip()
 
     
@@ -131,44 +138,46 @@ def create_client():
 
 
 def create_destination():
-    location = input("Enter the destination: (by city name)")
-    category = input("Enter the category: (from the list of options)")
-    cost_per_day = input("Enter the cost per day: (i.e.350.00)")
+    print()
+    print("Please select from the list:")
+    print(*Destination.destination_list())
+    print()
+    location = input("Enter the destination (by city name): ").strip()
+    print()
+    print("Please select from the list:")
+    print(*Destination.category_list())
+    print()
+    category = input("Enter the category (from the list of options): ").strip()
+    cost_per_day = input("Enter the cost per day (e.g. 350.00): ").strip()
     if (
-        isinstance(location, str)
-        and isinstance(category, str)
-        and isinstance(cost_per_day, str)
-        and len(location)
+        len(location)
         and len(category)
         and len(cost_per_day)
     ):
         try:
-            destination = Destination.create(location.title(), category, cost_per_day)
+            destination = Destination.create(location.title(), category, float(cost_per_day))
             print(destination)
         except Exception as e:
-            print("Error in creating a new destination")
-    print("Invalid location, category, or cost_per_day")
+            print("Error in creating a new destination:", e)
+    else:
+        print("Invalid location, category, or cost_per_day")
 
 
 def create_booking():
-    start_date = input("Enter the start date of the trip (MM/DD/YYYY): ")
-    end_date = input("Enter the end date of the trip (MM/DD/YYYY): ")
-    total_price = input("Enter the total price: (i.e. 1000.00)")
-    client_id = input("Enter the client's id: ")
-    destination_id = input("Enter the destination's id: ")
+    start_date = input("Enter the start date of the trip (MM/DD/YYYY): ").strip()
+    end_date = input("Enter the end date of the trip (MM/DD/YYYY): ").strip()
+    total_price = input("Enter the total price (e.g. 1000.00): ").strip()
+    client_id = input("Enter the client's id: ").strip()
+    destination_id = input("Enter the destination's id: ").strip()
     if (
         Client.find_by_id(client_id)
         and Destination.find_by_id(destination_id)
         and len(start_date)
         and len(end_date)
         and len(total_price)
-        and re.match(
-            r"([0][1-9]|[1][0-2])\/([0][1-9]|[12][0-9]|[3][01])\/\d{4}", start_date
-        )
-        and re.match(
-            r"([0][1-9]|[1][0-2])\/([0][1-9]|[12][0-9]|[3][01])\/\d{4}", end_date
-        )
-        and re.match(r"[0-9]+\.[0-9]{2}", total_price)
+        and len(client_id)
+        and len(destination_id)
+        and re.match(r"^[0-9]+(\.[0-9]{1,2})?$", total_price)
     ):
         try:
             booking = Booking.create(
@@ -180,8 +189,9 @@ def create_booking():
             )
             print(booking)
         except Exception as e:
-            print("Error creating booking: ", e)
-    print("Invalid start date, end date, total price, client id, or destination id")
+            print("Error creating booking:", e)
+    else:        
+        print("Invalid start date, end date, total price, client id, or destination id")
 
 
 def update_client_by_id(id, name, start_date, end_date, category):
@@ -193,22 +203,22 @@ def update_client_by_id(id, name, start_date, end_date, category):
         client.category = category
         client = client.update()
     except Exception as e:
-        return e
+        raise Exception(e)
     print(client)
 
 
 def update_client():
-    idx = input("Enter the client's id: ")
-    name = input("Enter the client's name: ")
-    start_date = input("Enter the start date of your trip (MM/DD/YYYY): ")
-    end_date = input("Enter the end date of your trip (MM/DD/YYYY): ")
-    category = input("Enter the category of your interest: (from the list)")
+    idx = input("Enter the client's id: ").strip()
+    name = input("Enter the client's name: ").strip()
+    start_date = input("Enter the start date of your trip (MM/DD/YYYY): ").strip()
+    end_date = input("Enter the end date of your trip (MM/DD/YYYY): ").strip()
+    print()
+    print("Please select from the list:")
+    print(*Destination.category_list())
+    print()
+    category = input("Enter the category of your interest (from the list): ").strip()
     if (
-        isinstance(name, str)
-        and isinstance(start_date, str)
-        and isinstance(end_date, str)
-        and isinstance(category, str)
-        and re.match(r"^\d+$", idx)
+        re.match(r"^\d+$", idx)
         and int(idx) > 0
         and len(name)
         and len(start_date)
@@ -218,8 +228,9 @@ def update_client():
         try:
             update_client_by_id(idx, name, start_date, end_date, category)
         except Exception as e:
-            print("Error updating client: ", e)
-    print("Invalid id, name, start date, end date, or category")
+            print("Error updating client:", e)
+    else:
+        print("Invalid id, name, start date, end date, or category")
 
 
 def update_destination_by_id(id, location, category, cost_per_day):
@@ -227,33 +238,39 @@ def update_destination_by_id(id, location, category, cost_per_day):
         destination = Destination.find_by_id(id)
         destination.location = location.title()
         destination.category = category
-        destination.cost_per_day_day = cost_per_day
+        destination.cost_per_day = cost_per_day
         destination = destination.update()
+        print(destination)
     except Exception as e:
-        return e
-    print(destination)
-
+        raise Exception(e)
 
 def update_destination():
-    idx = input("Enter the destination's id: ")
-    location = input("Enter the destination's location: ")
-    category = input("Enter the category of your trip: ")
-    cost_per_day = input("Enter the cost per day of the trip: ")
+    idx = input("Enter the destination's id: ").strip()
+    print()
+    print("Please select from the list:")
+    print(*Destination.destination_list())
+    print()
+    location = input("Enter the destination's location: ").strip()
+    print()
+    print("Please select from the list:")
+    print(*Destination.category_list())
+    print()
+    category = input("Enter the category of your trip: ").strip()
+    cost_per_day = input("Enter the cost per day of the trip: ").strip()
     if (
-        isinstance(location, str)
-        and isinstance(category, str)
-        and isinstance(cost_per_day, float)
-        and re.match(r"^\d+$", idx)
+        re.match(r"^\d+$", idx)
         and int(idx) > 0
         and len(location)
         and len(category)
         and len(cost_per_day)
+        and re.match(r"^[0-9]+(\.[0-9]{1,2})?$", cost_per_day)
     ):
         try:
-            update_destination_by_id(idx, location, category, cost_per_day)
+            update_destination_by_id(idx, location, category, float(cost_per_day))
         except Exception as e:
-            print("Error updating destination: ", e)
-    print("Invalid id, location, category, or cost_per_day")
+            print("Error updating destination:", e)
+    else:
+        print("Invalid id, location, category, or cost_per_day")
 
 
 def update_booking_by_id(
@@ -264,32 +281,29 @@ def update_booking_by_id(
         booking.start_date = start_date
         booking.end_date = end_date
         booking.total_price = float(total_price)
-        booking.client_id = client_id
-        booking.destination_id = destination_id
+        booking.client_id = int(client_id)
+        booking.destination_id = int(destination_id)
         booking = booking.update()
         print(booking)
     except Exception as e:
-        print("Error updating booking: ", e)
+        print("Error updating booking:", e)
 
 
 def update_booking():
-    idx = input("Enter the booking's id: ")
-    start_date = input("Enter the destination's start date (MM/DD/YYYY): ")
-    end_date = input("Enter the destination's end date (MM/DD/YYYY): ")
-    total_price = input("Enter the total price of the trip (i.e. 1000.00): ")
-    client_name = input("Enter the client's name: ")
-    destination_location = input("Enter the destination's location: ")
+    idx = input("Enter the booking's id: ").strip()
+    start_date = input("Enter the destination's start date (MM/DD/YYYY): ").strip()
+    end_date = input("Enter the destination's end date (MM/DD/YYYY): ").strip()
+    total_price = input("Enter the total price of the trip (i.e. 1000.00): ").strip()
+    client_id = input("Enter the client's ID: ").strip()
+    destination_id = input("Enter the destination's ID: ").strip()
     if (
-        isinstance(start_date, str)
-        and isinstance(end_date, str)
-        and isinstance(total_price, float)
-        and re.match(r"^\d+$", idx)
+        re.match(r"^\d+$", idx)
         and int(idx) > 0
         and len(start_date)
         and len(end_date)
         and len(total_price)
-        and len(client_name)
-        and len(destination_location)
+        and len(client_id)
+        and len(destination_id)
     ):
         try:
             update_booking_by_id(
@@ -297,38 +311,43 @@ def update_booking():
                 start_date,
                 end_date,
                 total_price,
-                client_name,
-                destination_location,
+                client_id,
+                destination_id
             )
         except Exception as e:
-            print("Error updating booking: ", e)
-    print(
-        "Invalid id, start_date, end_date, total_price, client_name, destination_location"
-    )
+            print("Error updating booking:", e)
+    else:
+        print(
+            "Invalid id, start_date, end_date, total_price, client_name, destination_location"
+        )
 
 
 def delete_client_by_id(id):
-    if client := Client.find_by_id(int(id)):
-        client.delete()
-        print("Client successfully deleted")
-    else:
-        print("Invalid id")
+    try:
+        if client := Client.find_by_id(int(id)):
+            client.delete()
+            print("Client successfully deleted")
+        else:
+            print("Invalid id")
+    except Exception as e:
+        raise Exception(e)
 
 
 def delete_client():
-    idx = input("Enter the client's id: ")
+    idx = input("Enter the client's id: ").strip()
     if isinstance(idx, str) and re.match(r"^\d+$", idx) and int(idx) > 0:
         try:
             delete_client_by_id(idx)
         except Exception as e:
-            print("Error deleting client: ", e)
-    print("Invalid id")
+            print("Error deleting client:", e)
+    else:
+        print("Invalid id")
 
 
 def delete_destination_by_id(id):
     destination = Destination.find_by_id(id)
     destination = destination.delete()
-    print(destination)
+    print("Destination successfully deleted")
 
 
 def delete_destination():
@@ -337,7 +356,7 @@ def delete_destination():
         try:
             delete_destination_by_id(idx)
         except Exception as e:
-            print("Error deleting destination: ", e)
+            print("Error deleting destination:", e)
     else:
         print("Invalid id")
 
@@ -346,9 +365,9 @@ def delete_booking_by_id(id):
     try:
         booking = Booking.find_by_id(id)
         booking = booking.delete()
+        print("Booking successfully deleted")
     except Exception as e:
-        return e
-    print(booking)
+        raise Exception(e)
 
 
 def delete_booking():
@@ -370,4 +389,3 @@ def exit_program():
 from models.client import Client
 from models.destination import Destination
 from models.booking import Booking
-from seed import DESTINATIONS

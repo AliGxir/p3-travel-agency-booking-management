@@ -3,6 +3,21 @@ import re
 
 class Destination:
     all = {}
+    
+    DESTINATIONS = [
+        "Oahu",
+        "Rome",
+        "Paris",
+        "Tokyo",
+        "Amsterdam",
+        "Singapore",
+        "Bangkok",
+        "Hong Kong",
+        "New York",
+        "San Francisco",
+    ]
+
+    CATEGORIES = ["nature", "historic", "food", "excursion"]
 
     def __init__(self, location, category, cost_per_day, id=None):
         self.location = location
@@ -11,7 +26,7 @@ class Destination:
         self.id = id
 
     def __repr__(self):
-        return f"<Destination {self.id}: {self.location}, {self.category}, {self.cost_per_day}"
+        return f"<Destination {self.id}: {self.location}, {self.category}, {self.cost_per_day:.2f}"
 
     @property
     def location(self):
@@ -21,7 +36,7 @@ class Destination:
     def location(self, location):
         if not isinstance(location, str):
             raise TypeError("location must be in string format")
-        elif not re.match(r"^[a-zA-Z]+(?:\s[a-zA-Z]+)?$", location):
+        elif location not in self.destination_list():
             raise ValueError("Please fill out location from the DESTINATIONS list")
         self._location = location
 
@@ -64,7 +79,16 @@ class Destination:
             CONN.rollback()
             return e
         return [Booking(row[1], row[2], row[3], row[0]) for row in rows]
+    
+    # Helper Methods
+    @classmethod
+    def destination_list(cls):
+        return cls.DESTINATIONS
 
+    @classmethod
+    def category_list(cls):
+        return cls.CATEGORIES
+    
     # Utility ORM Methods
     @classmethod
     def create_table(cls):
@@ -98,7 +122,7 @@ class Destination:
             return e
 
     @classmethod
-    def create(cls,location, category, cost_per_day):
+    def create(cls, location, category, cost_per_day):
         new_destination = cls(location, category, cost_per_day)
         new_destination.save()
         return new_destination
@@ -108,7 +132,7 @@ class Destination:
         try:
             CURSOR.execute(
                 """ 
-                    SELECT  * FROM destinations
+                    SELECT * FROM destinations
                     ORDER BY id DESC
                     LIMIT 1;
                 """
@@ -139,7 +163,7 @@ class Destination:
             CURSOR.execute(
                 """
                     SELECT * FROM destinations
-                    WHERE id is ?;
+                    WHERE location is ?;
                 """,
                     (location,),
             )
@@ -162,8 +186,8 @@ class Destination:
             row = CURSOR.fetchone()
         except Exception as e:
             CONN.rollback()
-            return e
-        return cls(row[1],  row[2], row[3], row[0]) if row else None
+            raise Exception(e)
+        return cls(row[1], row[2], row[3], row[0]) if row else None
     
     @classmethod
     def find_or_create_by(cls, location, category, cost_per_day):

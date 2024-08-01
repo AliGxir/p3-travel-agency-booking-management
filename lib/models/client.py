@@ -216,9 +216,9 @@ class Client:
                 (id,),
             )
             row = CURSOR.fetchone()
-        except Exception as e:
+        except Exception:
             CONN.rollback
-            return e
+            raise ValueError("no such client ID found")
         return cls(row[1], row[2], row[3], row[4], row[5], row[0]) if row else None
 
     # Utility ORM Instance Methods
@@ -273,7 +273,7 @@ class Client:
             CURSOR.execute(
                 """ 
                     DELETE FROM clients
-                    WHERE id = ?
+                    WHERE id = ?;
                 """,
                 (self.id,),
             )
@@ -281,7 +281,8 @@ class Client:
             del type(self).all[self.id]
             self.id = None
         except Exception as e:
-            return e
+            #raise Exception(e)
+            pass
         return self
 
 from models.booking import Booking

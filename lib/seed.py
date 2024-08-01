@@ -5,20 +5,7 @@ from random import sample
 from faker import Faker
 fake = Faker()
 
-DESTINATIONS = [
-    "Oahu",
-    "Rome",
-    "Paris",
-    "Tokyo",
-    "Amsterdam",
-    "Singapore",
-    "Bangkok",
-    "Hong Kong",
-    "New York",
-    "San Francisco",
-]
 
-CATEGORIES = ["nature", "historic", "food", "excursion"]
 
 def drop_tables():
     Booking.drop_table()
@@ -37,12 +24,12 @@ def seed_tables():
                 fake.name(),
                 fake.date_this_year().strftime("%m/%d/%Y"),
                 fake.date_this_year().strftime("%m/%d/%Y"),
-                sample(CATEGORIES, 1)[0],
-                sample(DESTINATIONS, 1)[0],
+                sample(Destination.category_list(), 1)[0],
+                sample(Destination.destination_list(), 1)[0],
             )
             Destination.create(
-                location=sample(DESTINATIONS, 1)[0],
-                category=sample(CATEGORIES, 1)[0],
+                location=sample(Destination.destination_list(), 1)[0],
+                category=sample(Destination.category_list(), 1)[0],
                 cost_per_day=fake.pyfloat(
                     right_digits=2, positive=True, max_value=10000
                 ),

@@ -17,9 +17,9 @@ class Booking:
 
     def __repr__(self):
         return (
-            f"<Booking {self.id}: {self.start_date}-{self.end_date},"
-            + f"{self.total_price},"
-            + f"Client ID: {self.client_id},"
+            f"<Booking {self.id}: {self.start_date}-{self.end_date}, "
+            + f"{self.total_price:.2f}, "
+            + f"Client ID: {self.client_id}, "
             + f"Destination ID: {self.destination_id}>"
         )
 
@@ -140,8 +140,11 @@ class Booking:
 
     @classmethod
     def create(cls, start_date, end_date, total_price, client_id, destination_id):
-        new_booking = cls(start_date, end_date, total_price, client_id, destination_id)
-        new_booking.save()
+        try:
+            new_booking = cls(start_date, end_date, total_price, client_id, destination_id)
+            new_booking.save()
+        except Exception as e:
+            raise ValueError(e)
         return new_booking
 
     @classmethod
