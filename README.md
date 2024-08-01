@@ -13,6 +13,8 @@
 
 - The broad overview of the CLI are a welcome message, then a menu of options of listing classes, then finding an object by attribute, creating a new object, updating an existing object, and deleting an object. 
 
+![CLI](image.png)
+
 ---
 
 ## 2. Installation
