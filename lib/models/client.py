@@ -66,7 +66,7 @@ class Client:
     def category(self, category):
         if not isinstance(category, str):
             raise TypeError("category must be in string format")
-        elif not ("nature", "historic", "food", "excursion"):
+        elif category not in ("nature", "historic", "food", "excursion"):
             raise ValueError(
                 "category must be one of the options of: nature, historic, food, or excursion"
             )
@@ -80,7 +80,7 @@ class Client:
     def destination(self, destination):
         if not isinstance(destination, str):
             raise TypeError("destination must be in string format")
-        elif not (
+        elif destination not in (
             "Oahu",
             "Rome",
             "Paris",
@@ -152,11 +152,11 @@ class Client:
     @classmethod
     def create(cls, name, start_date, end_date, category, destination):
         try:
-            new_client = cls(name, start_date, end_date, category, destination)
+            new_client = cls(name.title(), start_date, end_date, category, destination.title())
             new_client.save()
         except Exception as e:
             CONN.rollback
-            return e
+            raise ValueError(e)
         return new_client
 
     @classmethod

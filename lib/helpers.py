@@ -106,28 +106,28 @@ def find_destinations_by_client_name():
 
 
 def create_client():
-    name = input("Enter the client's name (i.e. Alicia): ")
-    start_date = input("Enter the start date of your trip (MM/DD/YYYY): ")
-    end_date = input("Enter the end date of your trip (MM/DD/YYYY): ")
-    category = input("Enter the category of your interest (from the list): ")
-    destination = input("Enter the destination (from the list): ")
+    name = input("Enter the client's name (i.e. Alicia): ").strip()
+    start_date = input("Enter the start date of your trip (MM/DD/YYYY): ").strip()
+    end_date = input("Enter the end date of your trip (MM/DD/YYYY): ").strip()
+    category = input("Enter the category of your interest (from the list): ").strip()
+    destination = input("Enter the destination (from the list): ").strip()
+
+    
     if (
-        isinstance(name, str)
-        and isinstance(start_date, str)
-        and isinstance(end_date, str)
-        and isinstance(category, str)
-        and isinstance(destination, str)
-        and len(name)
+        len(name)
         and len(start_date)
         and len(end_date)
         and len(category)
+        and len(destination)
     ):
         try:
             client = Client.create(name.title(), start_date, end_date, category, destination)
             print("Successfully created new client!")
             print(client)
         except Exception as e:
-            print("Error in creating a new client: ", e)
+            print("Error in creating a new client:", e)
+    else:
+        print("Invalid input: Ensure all fields are properly filled out!")
 
 
 def create_destination():
