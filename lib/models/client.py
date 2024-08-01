@@ -111,9 +111,7 @@ class Client:
         except Exception as e:
             CONN.rollback()
             return e
-        return [
-            Booking(row[1], row[2], row[3], row[4], row[5], row[0]) for row in rows
-        ]
+        return [Booking(row[1], row[2], row[3], row[4], row[5], row[0]) for row in rows]
 
     # Utility ORM Methods
     @classmethod
@@ -152,7 +150,9 @@ class Client:
     @classmethod
     def create(cls, name, start_date, end_date, category, destination):
         try:
-            new_client = cls(name.title(), start_date, end_date, category, destination.title())
+            new_client = cls(
+                name.title(), start_date, end_date, category, destination.title()
+            )
             new_client.save()
         except Exception as e:
             CONN.rollback
@@ -281,8 +281,9 @@ class Client:
             del type(self).all[self.id]
             self.id = None
         except Exception as e:
-            #raise Exception(e)
+            # raise Exception(e)
             pass
         return self
+
 
 from models.booking import Booking

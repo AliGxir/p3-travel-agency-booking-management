@@ -96,7 +96,7 @@ def find_destinations_by_client_name():
         if name and re.match(r"^[a-zA-Z ]+$", name):
             client = Client.find_by_name(name)
             if client:
-                    print(client.destination)
+                print(client.destination)
             else:
                 print("No client found with that name")
         else:
@@ -119,7 +119,6 @@ def create_client():
     print()
     destination = input("Enter the destination (from the list): ").strip()
 
-    
     if (
         len(name)
         and len(start_date)
@@ -128,7 +127,9 @@ def create_client():
         and len(destination)
     ):
         try:
-            client = Client.create(name.title(), start_date, end_date, category, destination)
+            client = Client.create(
+                name.title(), start_date, end_date, category, destination
+            )
             print("Successfully created new client!")
             print(client)
         except Exception as e:
@@ -149,13 +150,11 @@ def create_destination():
     print()
     category = input("Enter the category (from the list of options): ").strip()
     cost_per_day = input("Enter the cost per day (e.g. 350.00): ").strip()
-    if (
-        len(location)
-        and len(category)
-        and len(cost_per_day)
-    ):
+    if len(location) and len(category) and len(cost_per_day):
         try:
-            destination = Destination.create(location.title(), category, float(cost_per_day))
+            destination = Destination.create(
+                location.title(), category, float(cost_per_day)
+            )
             print(destination)
         except Exception as e:
             print("Error in creating a new destination:", e)
@@ -190,7 +189,7 @@ def create_booking():
             print(booking)
         except Exception as e:
             print("Error creating booking:", e)
-    else:        
+    else:
         print("Invalid start date, end date, total price, client id, or destination id")
 
 
@@ -243,6 +242,7 @@ def update_destination_by_id(id, location, category, cost_per_day):
         print(destination)
     except Exception as e:
         raise Exception(e)
+
 
 def update_destination():
     idx = input("Enter the destination's id: ").strip()
@@ -307,12 +307,7 @@ def update_booking():
     ):
         try:
             update_booking_by_id(
-                idx,
-                start_date,
-                end_date,
-                total_price,
-                client_id,
-                destination_id
+                idx, start_date, end_date, total_price, client_id, destination_id
             )
         except Exception as e:
             print("Error updating booking:", e)

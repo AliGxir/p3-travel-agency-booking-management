@@ -2,6 +2,7 @@ from models.__init__ import CURSOR, CONN
 import re
 from datetime import datetime
 
+
 class Booking:
     all = {}
 
@@ -141,7 +142,9 @@ class Booking:
     @classmethod
     def create(cls, start_date, end_date, total_price, client_id, destination_id):
         try:
-            new_booking = cls(start_date, end_date, total_price, client_id, destination_id)
+            new_booking = cls(
+                start_date, end_date, total_price, client_id, destination_id
+            )
             new_booking.save()
         except Exception as e:
             raise ValueError(e)
@@ -149,7 +152,7 @@ class Booking:
 
     @classmethod
     def new_from_db(cls):
-        try: 
+        try:
             CURSOR.execute(
                 """ 
                     SELECT  * FROM bookings
@@ -172,7 +175,7 @@ class Booking:
                 """ 
                     SELECT * FROM bookings;
                 """
-                )
+            )
             rows = CURSOR.fetchall()
         except Exception as e:
             CONN.rollback()
@@ -240,7 +243,7 @@ class Booking:
             type(self).all[self.id] = self
         except Exception as e:
             CONN.rollback()
-            return e 
+            return e
         return self
 
     def update(self):
@@ -276,6 +279,7 @@ class Booking:
             CONN.rollback()
             return e
         return self
+
 
 from models.client import Client
 from models.destination import Destination

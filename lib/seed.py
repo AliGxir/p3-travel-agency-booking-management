@@ -3,8 +3,8 @@ from models.destination import Destination
 from models.client import Client
 from random import sample
 from faker import Faker
-fake = Faker()
 
+fake = Faker()
 
 
 def drop_tables():
@@ -12,10 +12,12 @@ def drop_tables():
     Destination.drop_table()
     Client.drop_table()
 
+
 def create_tables():
     Client.create_table()
     Destination.create_table()
     Booking.create_table()
+
 
 def seed_tables():
     for _ in range(50):
@@ -52,6 +54,7 @@ def seed_tables():
             print("Created booking")
         except Exception as e:
             print("Failed to create booking due to error: ", e)
+
 
 if __name__ == "__main__":
     drop_tables()

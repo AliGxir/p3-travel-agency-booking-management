@@ -1,9 +1,10 @@
 from models.__init__ import CURSOR, CONN
 import re
 
+
 class Destination:
     all = {}
-    
+
     DESTINATIONS = [
         "Oahu",
         "Rome",
@@ -30,7 +31,7 @@ class Destination:
 
     @property
     def location(self):
-        return self._location 
+        return self._location
 
     @location.setter
     def location(self, location):
@@ -79,7 +80,7 @@ class Destination:
             CONN.rollback()
             return e
         return [Booking(row[1], row[2], row[3], row[0]) for row in rows]
-    
+
     # Helper Methods
     @classmethod
     def destination_list(cls):
@@ -88,7 +89,7 @@ class Destination:
     @classmethod
     def category_list(cls):
         return cls.CATEGORIES
-    
+
     # Utility ORM Methods
     @classmethod
     def create_table(cls):
@@ -142,7 +143,7 @@ class Destination:
             CONN.rollback()
             return e
         return cls(row[1], row[2], row[3], row[0])
-    
+
     @classmethod
     def get_all(cls):
         try:
@@ -156,23 +157,23 @@ class Destination:
             CONN.rollback()
             return e
         return [cls(row[1], row[2], row[3], row[0]) for row in rows]
-    
+
     @classmethod
-    def find_by_location(cls, location): 
+    def find_by_location(cls, location):
         try:
             CURSOR.execute(
                 """
                     SELECT * FROM destinations
                     WHERE location is ?;
                 """,
-                    (location,),
+                (location,),
             )
             row = CURSOR.fetchone()
         except Exception as e:
             CONN.rollback()
             return e
         return cls(row[1], row[2], row[3], row[0]) if row else None
-    
+
     @classmethod
     def find_by_id(cls, id):
         try:
@@ -181,20 +182,20 @@ class Destination:
                     SELECT * FROM destinations
                     WHERE id is ?;
                 """,
-                    (id,),
+                (id,),
             )
             row = CURSOR.fetchone()
         except Exception as e:
             CONN.rollback()
             raise Exception(e)
         return cls(row[1], row[2], row[3], row[0]) if row else None
-    
+
     @classmethod
     def find_or_create_by(cls, location, category, cost_per_day):
         return cls.find_by_location(location) or cls.create(
             location, category, cost_per_day
         )
-        
+
     # Utility ORM Instance Methods
     def save(self):
         try:
@@ -203,7 +204,7 @@ class Destination:
                     INSERT INTO destinations (location, category, cost_per_day)
                     VALUES (?, ?, ?);
                 """,
-                    (self.location, self.category, self.cost_per_day),
+                (self.location, self.category, self.cost_per_day),
             )
             CONN.commit()
             self.id = CURSOR.lastrowid
@@ -212,7 +213,7 @@ class Destination:
             CONN.rollback()
             return e
         return self
-    
+
     def update(self):
         try:
             CURSOR.execute(
@@ -220,8 +221,8 @@ class Destination:
                     UPDATE destinations
                     SET location = ?, category = ?, cost_per_day = ?
                     WHERE id = ?
-                """, 
-                    (self.location, self.category, self.cost_per_day, self.id),
+                """,
+                (self.location, self.category, self.cost_per_day, self.id),
             )
             CONN.commit()
             type(self).all[self] = self
@@ -229,7 +230,7 @@ class Destination:
             CONN.rollback()
             return e
         return self
-    
+
     def delete(self):
         try:
             CURSOR.execute(
@@ -237,7 +238,7 @@ class Destination:
                     DELETE FROM destinations
                     WHERE id = ?
                 """,
-                    (self.id,),
+                (self.id,),
             )
             CONN.commit()
             del type(self).all[self.id]
@@ -246,5 +247,6 @@ class Destination:
             CONN.rollback()
             return e
         return self
-    
-from models.booking import Booking 
+
+
+from models.booking import Booking
